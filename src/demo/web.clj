@@ -27,10 +27,10 @@
   (with-open [socket (usend "\\basic\\" ip port )]
     (urecv socket)))
 
-(defn link [server]
-  (str "<a href='/" server "'>" server "</a>"))
+(defmacro link [target]
+  (list str "<a href='/" target "'>" target "</a>"))
 
-(def links (map link (keys servers)))
+(def links (for [k (keys servers)] (link k) ))
 
 (defn plainText [text]
   {:status 200 :headers {"Content-Type" "text/plain"} :body text})
