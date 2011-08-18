@@ -28,7 +28,7 @@
     (urecv socket)))
 
 (defmacro link [target]
-  (list str "<a href='/" target "'>" target "</a>"))
+  `(str "<a href='/" ~target "'>" ~target "</a>"))
 
 (def links (for [k (keys servers)] (link k) ))
 
