@@ -5,4 +5,4 @@
    [ring/ring-jetty-adapter "0.3.9"]]
 
   :aot [demo.web]
-  :repl-init demo.web )
+  :repl-init demo.test )
