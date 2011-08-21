@@ -13,7 +13,7 @@
 (defn getPlayer [infos idx]
   (Player. (get infos (str "player_" idx))
            (get infos (str "ping_" idx))
-           (get infos (str "score_" idx))
+           (Integer/parseInt (get infos (str "score_" idx)))
            (get infos (str "team_" idx))))
 
 (defn getPlayers [infos numplayers]
@@ -21,6 +21,9 @@
     (if (zero? idx)
       result
       (recur (conj result (getPlayer infos (- idx 1))) (dec idx)))))
+
+(defn sortByTeamScore [players]
+  (sort-by #(- (* 100 (.hashCode (:team %))) (:score %)) players))
 
 (defn getTeam [infos idx]
   (Team. (get infos (str "team" idx))
@@ -33,7 +36,7 @@
 (defn serverInfos [infos]
   (let [numplayers (Integer/parseInt (get infos "numplayers"))
         maxplayers (Integer/parseInt (get infos "maxplayers"))
-        players    (getPlayers infos numplayers)
+        players    (sortByTeamScore (getPlayers infos numplayers))
         [team1 team2] (map #(getTeam infos %) ["one" "two"])
         game       (Game. (get infos "mapname") (get infos "gametype") team1 team2 players)
         password   (not= (get infos "password") "0")

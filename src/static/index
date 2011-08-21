@@ -78,7 +78,7 @@ $("#debug").html(debug)
           <span class="cell">Player</span>
           <span class="cell">ping</span>
           <span class="cell">team</span>
-          <span class="cell">Score</span>
+          <span class="cell">score</span>
         </div>
         <div class="subelem" style="display: table-row">
           <span class="name cell" ></span>
