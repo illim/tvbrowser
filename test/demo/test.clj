@@ -12,4 +12,4 @@
   (toJsonStr (tinfos)))
 
 (defn t2 []
-  (toJsonStr (build (tinfos))))
+  (toJsonStr (serverInfos (tinfos))))

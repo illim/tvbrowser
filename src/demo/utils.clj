@@ -11,3 +11,7 @@
               pw (PrintWriter. sw)]
     (write-json x pw)
     (.toString sw)))
+
+(defn jsonPath [path]
+  (let [[[ _ path]] (re-seq #"/(.*)\.json" path )]
+    path))

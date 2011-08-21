@@ -1,0 +1,27 @@
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+</head>
+<script>//<![CDATA[
+  $(document).ready(function() {
+  $("a").click(function(e) {
+    e.preventDefault();
+      $.getJSON("http://localhost:5000/waking_fields.json",
+        function(data) {
+          var items = [];
+          $.each(data, function(i,item){
+            items.push('<li>' + item + '</li>');
+          });
+         $('<ul/>', {
+          'class': 'my-new-list',
+          html: items.join('')
+         }).appendTo('body');
+      });
+  });
+ });
+//]]></script>
+<body>
+    <a href="">Waking fields</a>
+    <ul id="mylist"/>
+</body>
+</html>
