@@ -1,4 +1,5 @@
-(ns demo.domain)
+(ns demo.domain
+  (:use clojure.contrib.monads))
 
 (defrecord Player [name ping score team])
 
@@ -22,8 +23,14 @@
       result
       (recur (conj result (getPlayer infos (- idx 1))) (dec idx)))))
 
+(defn playerIndex [player]
+  (domonad maybe-m
+           [team  (:team player)
+            teamx (* 100 (.hashCode team))
+            score (:score player) ] (- teamx score)))
+
 (defn sortByTeamScore [players]
-  (sort-by #(- (* 100 (.hashCode (:team %))) (:score %)) players))
+  (sort-by playerIndex players))
 
 (defn getTeam [infos idx]
   (Team. (get infos (str "team" idx))
