@@ -1,27 +1,96 @@
 <html>
 <head>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+<style type="text/css">
+.cell {
+  display: table-cell;
+  padding-right : 10px
+}
+</style>
 </head>
 <script>//<![CDATA[
-  $(document).ready(function() {
+var debug = ""
+
+function jsubst(pos, json){
+  $.each(json, function(key, value) {
+   var elem = pos.find('.'+key).first();
+   if (value && typeof value === 'object') {
+     if(value.length) {
+       var tmpl = elem.find('.subelem').first();
+       $.each(value, function(k, v){
+         var newelem = tmpl.clone();
+         jsubst(newelem, v);
+         elem.append(newelem);
+       });
+     } else {
+       jsubst(elem, value)
+     }
+   } else {
+     elem.html("" + value)
+   }
+  });
+}
+
+$(document).ready(function() {
   $("a").click(function(e) {
+    debug = ""
     e.preventDefault();
-      $.getJSON("http://localhost:5000/waking_fields.json",
-        function(data) {
-          var items = [];
-          $.each(data, function(i,item){
-            items.push('<li>' + item + '</li>');
-          });
-         $('<ul/>', {
-          'class': 'my-new-list',
-          html: items.join('')
-         }).appendTo('body');
+    var server_info = $('#_server_info_tmpl').clone()
+
+    $.getJSON($(this).attr("href"),
+      function(data) {
+        jsubst(server_info, data);
+        $('#server_info').empty();
+        $('#server_info').append(server_info.children())
+$("#debug").html(debug)
       });
   });
- });
+
+  $('#_server_info_tmpl').hide();
+});
 //]]></script>
 <body>
-    <a href="">Waking fields</a>
-    <ul id="mylist"/>
+<a href="/94.23.229.44/7778.json">Waking fields</a> - 
+<a href="/94.23.229.44/7780.json">Frenchie</a> - 
+<a href="/94.23.229.44/7782.json">Rox</a>
+<div id="_server_info_tmpl">
+  <div ><b><span class="name"></span></b> (Password? : <span class="password"></span>)</div>
+  <div>Players : <span class="numplayers"></span> / <span class="maxplayers"></span> </div>
+  <div class="admin" >
+    Admin : <span class="name"></span> (<span class="email"></span>)
+  </div>
+  <div class="game">
+    <div> Map : <span class="map"></span> (<span class="gametype"></span>)</div>
+    <div> Scores :
+      <span class="team1">
+        <span class="name"></span>
+        <span class="score"></span>
+      </span>
+      <span class="team2">
+        <span class="name"></span>
+        <span class="score"></span>
+      </span>
+    </div>
+    <br/>
+    <div>
+      <span class="players" style="display: table">
+        <div style="display: table-row; font-weight:bold">
+          <span class="cell">Player</span>
+          <span class="cell">ping</span>
+          <span class="cell">team</span>
+          <span class="cell">Score</span>
+        </div>
+        <div class="subelem" style="display: table-row">
+          <span class="name cell" ></span>
+          <span class="ping cell" ></span>
+          <span class="team cell" ></span>
+          <span class="score cell"></span>
+        </div>
+      </span>
+    </div>
+  </div>
+</div>
+<div id="server_info"> </div>
+<span id="debug"></span>
 </body>
 </html>

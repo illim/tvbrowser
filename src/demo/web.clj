@@ -1,12 +1,10 @@
 (ns demo.web
   (:use ring.adapter.jetty)
-  (:use ring.middleware.resource)
+  (:use ring.util.response)
   (:use clojure.contrib.monads)
   (:use demo.utils)
   (:use demo.domain)
   (:use demo.net))
-
-(def servers { "waking_fields" ["94.23.229.44" 7778] })
 
 (defn ask [[ip port]]
   (with-open [socket (usend "\\basic\\" ip port )]
@@ -20,19 +18,20 @@
 (defmacro link [target]
   `(str "<a href='/" ~target "'>" ~target "</a>"))
 
-(def homepage
-  (let [links (for [k (keys servers)] (link k) )]
-  {:status 200 :headers {"Content-Type" "text/html"} :body links }))
-
 (defn plainText [text]
   {:status 200 :headers {"Content-Type" "text/plain"} :body text})
 
 (defn handler [req]
-  (let [ path (jsonPath (:uri req))
-        server (get servers path)]
-    (with-monad maybe-m
-      (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(extractInfo (ask %))))) server) homepage ))))
+  (cond
+   (= "/" (:uri req)) (resource-response "/static/index")
+   (= "/favicon.ico" (:uri req)) (resource-response "/static/favicon.ico")
+   :else
+   (let [path (jsonPath (:uri req))
+         [ip port] (seq (.split path "/"))
+         server [ip (Integer/parseInt port)]]
+     (with-monad maybe-m
+       (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(extractInfo (ask %))))) server) (plainText "Unknown path") )))))
 
 (defn -main []
   (let [port (Integer/parseInt (System/getenv "PORT"))]
-    (run-jetty (wrap-resource handler "/static/index" ) {:port port})))
+    (run-jetty handler {:port port})))

@@ -8,7 +8,7 @@
 
 (defrecord Game [map gametype team1 team2 players])
 
-(defrecord Server [admin game numplayers maxplayers password])
+(defrecord Server [name admin game numplayers maxplayers password])
 
 (defn getPlayer [infos idx]
   (Player. (get infos (str "player_" idx))
@@ -17,7 +17,7 @@
            (get infos (str "team_" idx))))
 
 (defn getPlayers [infos numplayers]
-  (loop [result {} idx numplayers]
+  (loop [result [] idx numplayers]
     (if (zero? idx)
       result
       (recur (conj result (getPlayer infos (- idx 1))) (dec idx)))))
@@ -36,8 +36,6 @@
         players    (getPlayers infos numplayers)
         [team1 team2] (map #(getTeam infos %) ["one" "two"])
         game       (Game. (get infos "mapname") (get infos "gametype") team1 team2 players)
-        server     (Server. (getAdmin infos) game numplayers maxplayers (get infos "password")) ]
+        password   (not= (get infos "password") "0")
+        server     (Server. (get infos "hostname") (getAdmin infos) game numplayers maxplayers password) ]
     server))
-
-
-                              

@@ -10,7 +10,7 @@
     socket ))
 
 (defn urecv [socket]
-  (let [ bufsize 1024
+  (let [ bufsize 2048
          buf     (byte-array bufsize)
          packet  (DatagramPacket. buf bufsize) ]
     (doto socket
