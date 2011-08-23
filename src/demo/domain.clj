@@ -57,7 +57,7 @@
   (Integer/parseInt (second (re-find #".*\\numplayers\\([^\\]*)\\.*" message) )))
 
 (defn toPattern [args]
-  (Pattern/compile (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" args)) "\\\\.*")))
+  (Pattern/compile (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" args)) "\\\\(.*)\\\\final.*")))
 
 (def baseArgs
    [ "mapname", "numplayers", "maxplayers", "hostname", "hostport", "gametype", "gamever", "password", "gamename", "gamemode", "gamevariant", "teamone", "teamtwo", "teamonescore", "teamtwoscore", "adminname", "adminemail", "p","trackingstats", "dedicated", "minver" ])
