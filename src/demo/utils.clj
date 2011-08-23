@@ -2,10 +2,6 @@
   (:use clojure.contrib.json)
   (:import (java.io PrintWriter StringWriter)))
   
-(defn cutForEven [infos]
-  (let[ nbInfos (count infos)]
-    (take (- nbInfos (mod nbInfos 2)) infos)))
-
 (defn toJsonStr [x]
   (with-open [sw (StringWriter.)
               pw (PrintWriter. sw)]
