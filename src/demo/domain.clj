@@ -1,4 +1,5 @@
 (ns demo.domain
+  (:import (java.util.regex Pattern))
   (:use clojure.contrib.monads))
 
 (defrecord Player [name ping score team])
@@ -49,3 +50,29 @@
         password   (not= (get infos "password") "0")
         server     (Server. (get infos "hostname") (getAdmin infos) game numplayers maxplayers password) ]
     server))
+
+
+
+(defn extractNumPlayers [message]
+  (Integer/parseInt (second (re-find #".*\\numplayers\\([^\\]*)\\.*" message) )))
+
+(defn toPattern [args]
+  (Pattern/compile (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" args)) "\\\\.*")))
+
+(def baseArgs
+   [ "mapname", "numplayers", "maxplayers", "hostname", "hostport", "gametype", "gamever", "password", "gamename", "gamemode", "gamevariant", "teamone", "teamtwo", "teamonescore", "teamtwoscore", "adminname", "adminemail", "p","trackingstats", "dedicated", "minver" ])
+
+(defn playerArgs [numPlayers]
+  (let [rng  (range 0 numPlayers)
+        rrng (reverse rng)]
+    (reduce into [(map #(str "team_" %)   rng)
+                  (map #(str "score_" %)  rrng)
+                  (map #(str "ping_" %)   rrng)
+                  (map #(str "player_" %) rrng)])))
+
+(defn infoMap [message]
+  (let [numPlayers (extractNumPlayers message)
+        args       (into baseArgs (playerArgs numPlayers))
+        pattern    (toPattern args)
+        infos      (rest (re-find pattern message)) ]
+    (apply hash-map (interleave args infos))))

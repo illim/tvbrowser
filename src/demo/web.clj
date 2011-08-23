@@ -10,11 +10,6 @@
   (with-open [socket (usend "\\basic\\" ip port )]
     (urecv socket)))
 
-(defn extractInfo [message]
-  (let [infos (filter #(not (empty? %)) (seq (.split message  "\\\\")))
-        eveninfos (cutForEven infos)]
-    (apply hash-map eveninfos)))
-
 (defmacro link [target]
   `(str "<a href='/" ~target "'>" ~target "</a>"))
 
@@ -30,7 +25,7 @@
          [ip port] (seq (.split path "/"))
          server [ip (Integer/parseInt port)]]
      (with-monad maybe-m
-       (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(extractInfo (ask %))))) server) (plainText "Unknown path") )))))
+       (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (ask %))))) server) (plainText "Unknown path") )))))
 
 (defn -main []
   (let [port (Integer/parseInt (System/getenv "PORT"))]

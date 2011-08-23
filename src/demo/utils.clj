@@ -15,3 +15,4 @@
 (defn jsonPath [path]
   (let [[[ _ path]] (re-seq #"/(.*)\.json" path )]
     path))
+
