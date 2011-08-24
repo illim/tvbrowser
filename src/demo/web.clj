@@ -19,7 +19,6 @@
 (defn handleJsonPath [path]
   (let [ [ip port] (seq (.split path "/"))
          server [ip (Integer/parseInt port)] ]
-    (println (str "Handling " path))
     (with-monad maybe-m
       (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (ask %))))) server) (plainText "Unknown path") ))))
 
