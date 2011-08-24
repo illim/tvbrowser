@@ -12,3 +12,20 @@
   (let [[[ _ path]] (re-seq #"/(.*)\.json" path )]
     path))
 
+(def coolDownMap (ref {}))
+
+(defn coolDown [f & args]
+  (dosync
+   (let [compute (fn [] (let [newVal (apply f args)]
+                          (commute coolDownMap assoc args [newVal (atom 0) (System/currentTimeMillis)])
+                          newVal))
+         tuple (get @coolDownMap args)]
+     (if (nil? tuple)
+       (compute)
+       (let [[current dirty time] tuple
+             delta (- (System/currentTimeMillis) time)]
+         (if (and (> delta 2000) (== @dirty 0))
+           (if (== 1 (swap! dirty (fn [x] (if (== x 0) 1 0))))
+             (compute)
+             current)
+           current))))))

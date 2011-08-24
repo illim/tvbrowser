@@ -16,16 +16,19 @@
 (defn plainText [text]
   {:status 200 :headers {"Content-Type" "text/plain"} :body text})
 
+(defn handleJsonPath [path]
+  (let [ [ip port] (seq (.split path "/"))
+         server [ip (Integer/parseInt port)] ]
+    (println (str "Handling " path))
+    (with-monad maybe-m
+      (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (ask %))))) server) (plainText "Unknown path") ))))
+
 (defn handler [req]
   (cond
    (= "/" (:uri req)) (resource-response "/static/index")
    (= "/favicon.ico" (:uri req)) (resource-response "/static/favicon.ico")
    :else
-   (let [path (jsonPath (:uri req))
-         [ip port] (seq (.split path "/"))
-         server [ip (Integer/parseInt port)]]
-     (with-monad maybe-m
-       (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (ask %))))) server) (plainText "Unknown path") )))))
+   (coolDown handleJsonPath (jsonPath (:uri req)))))
 
 (defn -main []
   (let [port (Integer/parseInt (System/getenv "PORT"))]
