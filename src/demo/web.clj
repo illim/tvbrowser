@@ -13,8 +13,9 @@
 (defmacro link [target]
   `(str "<a href='/" ~target "'>" ~target "</a>"))
 
-(defn plainText [text]
-  {:status 200 :headers {"Content-Type" "text/plain"} :body text})
+(defn plainText
+  ([text] (plainText text 200))
+  ([text status] {:status status :headers {"Content-Type" "text/plain"} :body text}))
 
 (defn handleJsonPath [path]
   (let [ [ip port] (seq (.split path "/"))
@@ -27,7 +28,11 @@
    (= "/" (:uri req)) (resource-response "/static/index")
    (= "/favicon.ico" (:uri req)) (resource-response "/static/favicon.ico")
    :else
-   (coolDown handleJsonPath (jsonPath (:uri req)))))
+   (try
+     (coolDown handleJsonPath (jsonPath (:uri req)))
+     (catch Throwable t (do
+                          (.printStackTrace t)
+                          (plainText (str (.getClass t) (.getMessage t)) 406))))))
 
 (defn -main []
   (let [port (Integer/parseInt (System/getenv "PORT"))]
