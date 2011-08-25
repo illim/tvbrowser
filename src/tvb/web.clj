@@ -1,14 +1,13 @@
-(ns demo.web
+(ns tvb.web
   (:use ring.adapter.jetty)
   (:use ring.util.response)
   (:use clojure.contrib.monads)
-  (:use demo.utils)
-  (:use demo.domain)
-  (:use demo.net))
+  (:use tvb.utils)
+  (:use tvb.domain)
+  (:use tvb.net))
 
-(defn ask [[ip port]]
-  (with-open [socket (usend "\\basic\\" ip port )]
-    (urecv socket)))
+(defn basic [server]
+  (uask server "\\basic\\"))
 
 (defmacro link [target]
   `(str "<a href='/" ~target "'>" ~target "</a>"))
@@ -17,11 +16,11 @@
   ([text] (plainText text 200))
   ([text status] {:status status :headers {"Content-Type" "text/plain"} :body text}))
 
-(defn handleJsonPath [path]
+(defn handleJsonPath [^String path]
   (let [ [ip port] (seq (.split path "/"))
          server [ip (Integer/parseInt port)] ]
     (with-monad maybe-m
-      (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (ask %))))) server) (plainText "Unknown path") ))))
+      (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (basic %))))) server) (plainText "Unknown path") ))))
 
 (defn handler [req]
   (cond

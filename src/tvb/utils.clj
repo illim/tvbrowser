@@ -1,7 +1,8 @@
-(ns demo.utils
+(ns tvb.utils
   (:use clojure.contrib.json)
   (:import (java.io PrintWriter StringWriter)))
-  
+
+
 (defn toJsonStr [x]
   (with-open [sw (StringWriter.)
               pw (PrintWriter. sw)]
@@ -12,9 +13,12 @@
   (let [[[ _ path]] (re-seq #"/(.*)\.json" path )]
     path))
 
-(def coolDownMap (ref {}))
+
+
+(def ^{:private true} coolDownMap (ref {}))
 
 (defn coolDown [f & args]
+  "Dummy cache that somewhat cools down the hammering of the game server if there's a lot of demands. There still is a possibility to flood the game server every 5 seconds."
   (dosync
    (let [compute (fn [] (let [newVal (apply f args)]
                           (commute coolDownMap assoc args [newVal (atom 0) (System/currentTimeMillis)])
@@ -29,3 +33,15 @@
           (and (> delta 2000) (< delta 5000) (== @dirty 0)) (swapAndCompute)
           (> delta 5000) (compute)
           :else current))))))
+
+
+
+(defn flatTabulates [n fs]
+  "tabulates then concat the resulting seqs"
+  (let [rng  (range 0 n)
+        rrng (reverse rng)
+        sf   (reverse fs)]
+    (reduce into
+            (cons
+             (map (first sf) rng)
+             (map #(map % rrng) (rest sf))))))

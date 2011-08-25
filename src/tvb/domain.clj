@@ -1,5 +1,6 @@
-(ns demo.domain
+(ns tvb.domain
   (:import (java.util.regex Pattern))
+  (:use tvb.utils)
   (:use clojure.contrib.monads))
 
 (defrecord Player [name ping score team])
@@ -26,7 +27,7 @@
 
 (defn playerIndex [player]
   (domonad maybe-m
-           [team  (:team player)
+           [^Object team  (:team player)
             teamx (* 100 (.hashCode team))
             score (:score player) ] (- teamx score)))
 
@@ -63,12 +64,7 @@
    [ "mapname", "numplayers", "maxplayers", "hostname", "hostport", "gametype", "gamever", "password", "gamename", "gamemode", "gamevariant", "teamone", "teamtwo", "teamonescore", "teamtwoscore", "adminname", "adminemail", "p","trackingstats", "dedicated", "minver" ])
 
 (defn playerArgs [numPlayers]
-  (let [rng  (range 0 numPlayers)
-        rrng (reverse rng)]
-    (reduce into [(map #(str "team_" %)   rng)
-                  (map #(str "score_" %)  rrng)
-                  (map #(str "ping_" %)   rrng)
-                  (map #(str "player_" %) rrng)])))
+  (flatTabulates numPlayers (map #(fn [x] (str % "_" x)) ["player", "ping", "score", "team"])))
 
 (defn infoMap [message]
   (let [numPlayers (extractNumPlayers message)
