@@ -23,9 +23,9 @@
      (if (nil? tuple)
        (compute)
        (let [[current dirty time] tuple
-             delta (- (System/currentTimeMillis) time)]
-         (if (and (> delta 2000) (== @dirty 0))
-           (if (== 1 (swap! dirty (fn [x] (if (== x 0) 1 0))))
-             (compute)
-             current)
-           current))))))
+             delta (- (System/currentTimeMillis) time)
+             swapAndCompute (fn [] (if (== 1 (swap! dirty (fn [x] (if (== x 0) 1 0)))) (compute) current))]
+         (cond
+          (and (> delta 2000) (< delta 5000) (== @dirty 0)) (swapAndCompute)
+          (> delta 5000) (compute)
+          :else current))))))
