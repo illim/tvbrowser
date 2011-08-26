@@ -4,7 +4,8 @@
   (:use clojure.contrib.monads)
   (:use tvb.utils)
   (:use tvb.domain)
-  (:use tvb.net))
+  (:use tvb.net)
+  (:import (java.io File)))
 
 (defn basic [server]
   (uask server "\\basic\\"))
@@ -24,11 +25,16 @@
        (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (basic %))))) server)
        (plainText "Unknown path") ))))
 
-(defmacro mapStatics [& l]
-  (zipmap (map #(str "/" %) l) (map #(list 'resource-response (str "/static/" %)) l)))
+(defn findStatics []
+  (let [dir (File. "src/static")]
+    (map #(.getName %) (seq (.listFiles dir)))))
+
+(defmacro mapStatics []
+  (let [res (findStatics)]
+    (zipmap (map #(str "/" %) res) (map #(list 'resource-response (str "/static/" %)) res))))
 
 (def statics
-  (assoc (mapStatics "aldosnova.ttf" "alisonregular.ttf" "amazonebt.ttf" "anythingyouwant.ttf" "avqest.ttf" "favicon.ico" "ajax-loader.gif" "alexisitalic.ttf") "/" (resource-response "/static/index" )))
+  (assoc (mapStatics) "/" (resource-response "/static/index" )))
 
 (defn handler [req]
   (orElse

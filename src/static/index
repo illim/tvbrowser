@@ -13,7 +13,7 @@
 }
 @font-face {
 	font-family: imp_font;
-	src: url("aldosnova.ttf");
+	src: url('aldosnova.ttf');
 }
 .cell {
   display: table-cell;
