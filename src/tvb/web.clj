@@ -20,18 +20,24 @@
   (let [ [ip port] (seq (.split path "/"))
          server [ip (Integer/parseInt port)] ]
     (with-monad maybe-m
-      (m-plus (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (basic %))))) server) (plainText "Unknown path") ))))
+      (orElse
+       (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (basic %))))) server)
+       (plainText "Unknown path") ))))
+
+(defmacro mapStatics [& l]
+  (zipmap (map #(str "/" %) l) (map #(list 'resource-response (str "/static/" %)) l)))
+
+(def statics
+  (assoc (mapStatics "favicon.ico" "ajax-loader.gif") "/" (resource-response "/static/index" )))
 
 (defn handler [req]
-  (cond
-   (= "/" (:uri req)) (resource-response "/static/index")
-   (= "/favicon.ico" (:uri req)) (resource-response "/static/favicon.ico")
-   :else
+  (orElse
+   (get statics (:uri req))
    (try
      (coolDown handleJsonPath (jsonPath (:uri req)))
      (catch Throwable t (do
                           (.printStackTrace t)
-                          (plainText (str (.getClass t) (.getMessage t)) 406))))))
+                          (plainText (str (.getClass t) (.getMessage t)) 503))))))
 
 (defn -main []
   (let [port (Integer/parseInt (System/getenv "PORT"))]

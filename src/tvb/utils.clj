@@ -3,6 +3,9 @@
   (:import (java.io PrintWriter StringWriter)))
 
 
+(defmacro orElse [x y]
+  `(let [z# ~x] (if z# z# ~y)))
+
 (defn toJsonStr [x]
   (with-open [sw (StringWriter.)
               pw (PrintWriter. sw)]
@@ -33,15 +36,3 @@
           (and (> delta 2000) (< delta 5000) (== @dirty 0)) (swapAndCompute)
           (> delta 5000) (compute)
           :else current))))))
-
-
-
-(defn flatTabulates [n fs]
-  "tabulates then concat the resulting seqs"
-  (let [rng  (range 0 n)
-        rrng (reverse rng)
-        sf   (reverse fs)]
-    (reduce into
-            (cons
-             (map (first sf) rng)
-             (map #(map % rrng) (rest sf))))))

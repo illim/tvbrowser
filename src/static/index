@@ -26,33 +26,52 @@ function jsubst(pos, json){
        jsubst(elem, value)
      }
    } else {
-     elem.text("" + value)
+     colouredText("" + value, elem);
    }
   });
+}
+
+function colouredText(value, elem){
+  elem.text(value)
+  if (elem.hasClass('coloured')){
+    if (value == 'Blood Eagle'){
+     elem.css('color', 'red');
+    } else if (value == 'Imperial'){
+     elem.css('color', 'blue');
+    } else if (value == 'Phoenix'){
+     elem.css('color', '#868A08');
+    }
+  }
 }
 
 $(document).ready(function() {
   $("a").click(function(e) {
     debug = ""
     e.preventDefault();
+    $('#spinner').show();
     var server_info = $('#_server_info_tmpl').clone()
-
+ 
     $.getJSON($(this).attr("href"),
       function(data) {
-        jsubst(server_info, data);
         $('#server_info').empty();
+        jsubst(server_info, data);
         $('#server_info').append(server_info.children())
-$("#debug").html(debug)
-      }).error(function(jx, txt, err) { alert(txt + "(" +err+ ") :" + jx.responseText); });
-  });
+      }).error(function(jx, txt, err) { alert(txt + "(" +err+ ") :" + jx.responseText); })
+        .complete(function(){
+          $('#spinner').hide();
+          $('#debug').html(debug);
+        });
+  })
 
-  $('#_server_info_tmpl').hide();
+$('#_server_info_tmpl').hide();
+$('#spinner').hide();
 });
 //]]></script>
 <body>
 <a href="/94.23.229.44/7778.json">Waking fields</a> - 
 <a href="/94.23.229.44/7780.json">Frenchie</a> - 
 <a href="/94.23.229.44/7782.json">Rox</a>
+<img src="/ajax-loader.gif" id="spinner"/>
 <div id="_server_info_tmpl">
   <div ><b><span class="name"></span></b> (Password? : <span class="password"></span>)</div>
   <div>Players : <span class="numplayers"></span> / <span class="maxplayers"></span> </div>
@@ -63,11 +82,11 @@ $("#debug").html(debug)
     <div> Map : <span class="map"></span> (<span class="gametype"></span>)</div>
     <div> Scores :
       <span class="team1">
-        <span class="name"></span>
+        <span class="name coloured"></span>
         <span class="score"></span>
       </span>
       <span class="team2">
-        <span class="name"></span>
+        <span class="name coloured"></span>
         <span class="score"></span>
       </span>
     </div>
@@ -83,7 +102,7 @@ $("#debug").html(debug)
         <div class="subelem" style="display: table-row">
           <span class="name cell" ></span>
           <span class="ping cell" ></span>
-          <span class="team cell" ></span>
+          <span class="team coloured cell" ></span>
           <span class="score cell"></span>
         </div>
       </span>

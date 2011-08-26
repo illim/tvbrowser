@@ -53,22 +53,23 @@
     server))
 
 
-
 (defn extractNumPlayers [message]
   (Integer/parseInt (second (re-find #".*\\numplayers\\([^\\]*)\\.*" message) )))
 
-(defn toPattern [args]
-  (Pattern/compile (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" args)) "\\\\(.*)\\\\final.*")))
+(defn toPattern [attributes]
+  (Pattern/compile (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" attributes)) "\\\\(.*)\\\\final.*")))
 
-(def baseArgs
+(def baseAttributes
    [ "mapname", "numplayers", "maxplayers", "hostname", "hostport", "gametype", "gamever", "password", "gamename", "gamemode", "gamevariant", "teamone", "teamtwo", "teamonescore", "teamtwoscore", "adminname", "adminemail", "p","trackingstats", "dedicated", "minver" ])
 
-(defn playerArgs [numPlayers]
-  (flatTabulates numPlayers (map #(fn [x] (str % "_" x)) ["player", "ping", "score", "team"])))
+(defn playerAttributes [numPlayers]
+  (for [f (map #(fn [x] (str % "_" x)) ["player", "ping", "score", "team"])
+        n (range 0 numPlayers)]
+    (f n)))
 
 (defn infoMap [message]
   (let [numPlayers (extractNumPlayers message)
-        args       (into baseArgs (playerArgs numPlayers))
-        pattern    (toPattern args)
+        attributes (into baseAttributes (playerAttributes numPlayers))
+        pattern    (toPattern attributes)
         infos      (rest (re-find pattern message)) ]
-    (apply hash-map (interleave args infos))))
+    (apply hash-map (interleave attributes infos))))
