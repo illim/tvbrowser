@@ -28,7 +28,7 @@
   (zipmap (map #(str "/" %) l) (map #(list 'resource-response (str "/static/" %)) l)))
 
 (def statics
-  (assoc (mapStatics "favicon.ico" "ajax-loader.gif") "/" (resource-response "/static/index" )))
+  (assoc (mapStatics "aldosnova.ttf" "alisonregular.ttf" "amazonebt.ttf" "anythingyouwant.ttf" "avqest.ttf" "favicon.ico" "ajax-loader.gif" "alexisitalic.ttf") "/" (resource-response "/static/index" )))
 
 (defn handler [req]
   (orElse
