@@ -1,10 +1,18 @@
 (ns tvb.utils
   (:use clojure.contrib.json)
-  (:import (java.io PrintWriter StringWriter)))
+  (:import (java.io PrintWriter StringWriter))
+  (:import (java.io File)))
 
 
 (defmacro orElse [x y]
   `(let [z# ~x] (if z# z# ~y)))
+
+
+(defmacro mapResources [folder]
+  (let [ dir (File. (str "src/" folder))
+         fileNames (map #(.getName ^File %) (seq (.listFiles dir))) ]
+    (zipmap (map #(str "/" %) fileNames) (map #(list 'resource-response (str "/" folder "/" %)) fileNames))))
+
 
 (defn toJsonStr [x]
   (with-open [sw (StringWriter.)

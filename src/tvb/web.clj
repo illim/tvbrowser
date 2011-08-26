@@ -4,14 +4,10 @@
   (:use clojure.contrib.monads)
   (:use tvb.utils)
   (:use tvb.domain)
-  (:use tvb.net)
-  (:import (java.io File)))
+  (:use tvb.net))
 
 (defn basic [server]
   (uask server "\\basic\\"))
-
-(defmacro link [target]
-  `(str "<a href='/" ~target "'>" ~target "</a>"))
 
 (defn plainText
   ([text] (plainText text 200))
@@ -25,16 +21,10 @@
        (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (basic %))))) server)
        (plainText "Unknown path") ))))
 
-(defn findStatics []
-  (let [dir (File. "src/static")]
-    (map #(.getName %) (seq (.listFiles dir)))))
-
-(defmacro mapStatics []
-  (let [res (findStatics)]
-    (zipmap (map #(str "/" %) res) (map #(list 'resource-response (str "/static/" %)) res))))
-
 (def statics
-  (assoc (mapStatics) "/" (resource-response "/static/index" )))
+  (let [ m (mapResources "static")
+         indexResource (get m "/index") ]
+    (assoc m "/" indexResource)))
 
 (defn handler [req]
   (orElse
