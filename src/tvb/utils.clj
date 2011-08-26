@@ -29,7 +29,7 @@
 (def ^{:private true} coolDownMap (ref {}))
 
 (defn coolDown [f & args]
-  "Dummy cache that somewhat cools down the hammering of the game server if there's a lot of demands. There still is a possibility to flood the game server every 5 seconds."
+  "Dummy cache that somewhat cools down the hammering of the game server if there's a lot of demands. There still is a possibility to flood the game server every 8 seconds."
   (dosync
    (let [compute (fn [] (let [newVal (apply f args)]
                           (commute coolDownMap assoc args [newVal (atom 0) (System/currentTimeMillis)])
@@ -41,6 +41,6 @@
              delta (- (System/currentTimeMillis) time)
              swapAndCompute (fn [] (if (== 1 (swap! dirty (fn [x] (if (== x 0) 1 0)))) (compute) current))]
          (cond
-          (and (> delta 2000) (< delta 5000) (== @dirty 0)) (swapAndCompute)
-          (> delta 5000) (compute)
+          (and (> delta 4000) (< delta 8000) (== @dirty 0)) (swapAndCompute)
+          (> delta 8000) (compute)
           :else current))))))
