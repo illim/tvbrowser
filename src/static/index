@@ -4,33 +4,33 @@
 <!-- font from www.webpagepublicity.com -->
 <style type="text/css">
 @font-face {
-	font-family: phoenix_font;
-	src: url('alexisitalic.ttf');
+ font-family: phoenix_font;
+ src: url('alexisitalic.ttf');
 }
 @font-face {
-	font-family: be_font;
-	src: url('anythingyouwant.ttf');
+ font-family: be_font;
+ src: url('anythingyouwant.ttf');
 }
 @font-face {
-	font-family: imp_font;
-	src: url('aldosnova.ttf');
+ font-family: imp_font;
+ src: url('aldosnova.ttf');
 }
 .cell {
-  display: table-cell;
-  padding-right : 10px
+ display: table-cell;
+ padding-right : 10px
 }
 .BloodEagle {
-  color: #8A0829;
-  font-weight: bold;
-	font-family: be_font;
+ color: #8A0829;
+ font-weight: bold;
+ font-family: be_font;
 }
 .Imperial {
-  color: #0404B4;
-	font-family: imp_font;
+ color: #0404B4;
+ font-family: imp_font;
 }
 .Phoenix {
-  color: #868A08;
-	font-family: phoenix_font;
+ color: #868A08;
+ font-family: phoenix_font;
 }
 </style>
 </head>
@@ -93,41 +93,41 @@ $('#spinner').hide();
 <a href="/94.23.229.44/7782.json">Rox</a>
 <img src="/ajax-loader.gif" id="spinner"/>
 <div id="_server_info_tmpl">
-  <div ><b><span class="name"></span></b> (Password? : <span class="password"></span>)</div>
-  <div>Players : <span class="numplayers"></span> / <span class="maxplayers"></span> </div>
-  <div class="admin" >
-    Admin : <span class="name"></span> (<span class="email"></span>)
+<div ><b><span class="name"></span></b> (Password? : <span class="password"></span>)</div>
+<div>Players : <span class="numplayers"></span> / <span class="maxplayers"></span> </div>
+<div class="admin" >
+Admin : <span class="name"></span> (<span class="email"></span>)
+</div>
+<div class="game">
+<div> Map : <span class="map"></span> (<span class="gametype"></span>)</div>
+<div> Scores :
+ <span class="team1">
+  <span class="name coloured"></span>
+  <span class="score"></span>
+ </span>
+ <span class="team2">
+  <span class="name coloured"></span>
+  <span class="score" /></span>
+ </span>
+</div>
+<br/>
+<div>
+ <span class="players" style="display: table">
+  <div style="display: table-row; font-weight:bold">
+   <span class="cell">Player</span>
+   <span class="cell">ping</span>
+   <span class="cell">team</span>
+   <span class="cell">score</span>
   </div>
-  <div class="game">
-    <div> Map : <span class="map"></span> (<span class="gametype"></span>)</div>
-    <div> Scores :
-      <span class="team1">
-        <span class="name coloured"></span>
-        <span class="score"></span>
-      </span>
-      <span class="team2">
-        <span class="name coloured"></span>
-        <span class="score"></span>
-      </span>
-    </div>
-    <br/>
-    <div>
-      <span class="players" style="display: table">
-        <div style="display: table-row; font-weight:bold">
-          <span class="cell">Player</span>
-          <span class="cell">ping</span>
-          <span class="cell">team</span>
-          <span class="cell">score</span>
-        </div>
-        <div class="subelem" style="display: table-row">
-          <span class="name cell" ></span>
-          <span class="ping cell" ></span>
-          <span class="team coloured cell" ></span>
-          <span class="score cell"></span>
-        </div>
-      </span>
-    </div>
+  <div class="subelem" style="display: table-row">
+   <span class="name cell" ></span>
+   <span class="ping cell" ></span>
+   <span class="team coloured cell" ></span>
+   <span class="score cell"></span>
   </div>
+ </span>
+</div>
+</div>
 </div>
 <div id="server_info"> </div>
 <span id="debug"></span>
