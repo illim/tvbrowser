@@ -41,7 +41,7 @@
 (defn getAdmin [infos]
   (Admin. (get infos "adminname")
           (get infos "adminemail")))
-          
+
 (defn serverInfos [infos]
   (let [numplayers (Integer/parseInt (get infos "numplayers"))
         maxplayers (Integer/parseInt (get infos "maxplayers"))
