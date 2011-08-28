@@ -46,11 +46,11 @@
               current))]
   (dosync
    (let [tuple (get @coolDownMap args)]
-     (if (nil? tuple)
-       (compute)
+     (if tuple
        (let [[current dirty time] tuple
              delta (- (System/currentTimeMillis) time)]
          (cond
           (and (> delta timeBeforeRecompute) (< delta timeToLive) (== @dirty 0)) (swapAndCompute dirty current)
           (> delta timeToLive) (compute)
-          :else current)))))))
+          :else current))
+       (compute))))))

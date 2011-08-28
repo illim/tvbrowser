@@ -19,12 +19,6 @@
            (Integer/parseInt (get infos (str "score_" idx)))
            (get infos (str "team_" idx))))
 
-(defn getPlayers [infos numplayers]
-  (loop [result [] idx numplayers]
-    (if (zero? idx)
-      result
-      (recur (conj result (getPlayer infos (- idx 1))) (dec idx)))))
-
 (defn playerIndex [player]
   (domonad maybe-m
            [^Object team  (:team player)
@@ -38,19 +32,16 @@
   (Team. (get infos (str "team" idx))
          (get infos (str "team" idx "score"))))
 
-(defn getAdmin [infos]
-  (Admin. (get infos "adminname")
-          (get infos "adminemail")))
-
-(defn serverInfos [infos]
-  (let [numplayers (Integer/parseInt (get infos "numplayers"))
-        maxplayers (Integer/parseInt (get infos "maxplayers"))
-        players    (sortByTeamScore (getPlayers infos numplayers))
-        [team1 team2] (map #(getTeam infos %) ["one" "two"])
-        game       (Game. (get infos "mapname") (get infos "gametype") team1 team2 players)
-        password   (not= (get infos "password") "0")
-        server     (Server. (get infos "hostname") (getAdmin infos) game numplayers maxplayers password) ]
-    server))
+(defn serverInfos [{:strs [numplayers maxplayers password mapname gametype hostname adminname adminemail] :as infos}]
+  (let [nump          (Integer/parseInt numplayers)
+        players       (sortByTeamScore (map #(getPlayer infos %) (range 0 nump)))
+        [team1 team2] (map #(getTeam infos %) ["one" "two"]) ]
+    (Server. hostname
+             (Admin. adminname adminemail)
+             (Game. mapname gametype team1 team2 players)
+             nump
+             (Integer/parseInt maxplayers)
+             (not= "0" password))))
 
 
 (defn extractNumPlayers [message]
