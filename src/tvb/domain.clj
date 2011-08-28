@@ -19,23 +19,24 @@
            (Integer/parseInt (get infos (str "score_" idx)))
            (get infos (str "team_" idx))))
 
-(defn playerIndex [player]
-  (domonad maybe-m
-           [^Object team  (:team player)
-            teamx (* 100 (.hashCode team))
-            score (:score player) ] (- teamx score)))
-
-(defn sortByTeamScore [players]
-  (sort-by playerIndex players))
-
 (defn getTeam [infos idx]
   (Team. (get infos (str "team" idx))
          (get infos (str "team" idx "score"))))
 
+(defn getPlayers [infos team1 numplayers]
+  (letfn [(playerIndex [team1 player]
+            (domonad maybe-m
+                    [team  (:team player)
+                     score (:score player) ] [(= (:name team1) team) score]))]
+    (loop [result (sorted-set-by #(compare (playerIndex team1 %2) (playerIndex team1 %1)) []) idx numplayers]
+      (if (zero? idx)
+        result
+        (recur (conj result (getPlayer infos (- idx 1))) (dec idx))))))
+
 (defn serverInfos [{:strs [numplayers maxplayers password mapname gametype hostname adminname adminemail] :as infos}]
   (let [nump          (Integer/parseInt numplayers)
-        players       (sortByTeamScore (map #(getPlayer infos %) (range 0 nump)))
-        [team1 team2] (map #(getTeam infos %) ["one" "two"]) ]
+        [team1 team2] (map #(getTeam infos %) ["one" "two"])
+        players       (getPlayers infos team1 nump)]
     (Server. hostname
              (Admin. adminname adminemail)
              (Game. mapname gametype team1 team2 players)
