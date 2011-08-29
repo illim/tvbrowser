@@ -25,9 +25,7 @@
 
 (defn getPlayers [infos team1 numplayers]
   (letfn [(playerIndex [team1 player]
-            (domonad maybe-m
-                    [team  (:team player)
-                     score (:score player) ] [(= (:name team1) team) score]))]
+            [(= (:name team1) (:team player)) (:score player) (:name player)])]
     (loop [result (sorted-set-by #(compare (playerIndex team1 %2) (playerIndex team1 %1)) []) idx numplayers]
       (if (zero? idx)
         result
