@@ -6,15 +6,15 @@
 <style type="text/css">
 @font-face {
  font-family: phoenix_font;
- src: url('alexisitalic.ttf');
+ src: url('http://dl.dropbox.com/u/39786635/alexisitalic.ttf');
 }
 @font-face {
  font-family: be_font;
- src: url('anythingyouwant.ttf');
+ src: url('http://dl.dropbox.com/u/39786635/anythingyouwant.ttf');
 }
 @font-face {
  font-family: imp_font;
- src: url('aldosnova.ttf');
+ src: url('http://dl.dropbox.com/u/39786635/aldosnova.ttf');
 }
 .cell {
  display: table-cell;
