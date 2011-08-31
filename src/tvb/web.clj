@@ -4,7 +4,8 @@
   (:use clojure.contrib.monads)
   (:use tvb.utils)
   (:use tvb.domain)
-  (:use tvb.net))
+  (:use tvb.net)
+  (:import (com.sun.jna Native)))
 
 (defn basic [server]
   (uask server "\\basic\\"))
@@ -35,6 +36,27 @@
                           (.printStackTrace t)
                           (plainText (str (.getClass t) (.getMessage t)) 503))))))
 
+(gen-interface
+ :name jna.GSLibrary
+ :extends [com.sun.jna.Library]
+ :methods [[main [Integer #=(java.lang.Class/forName "[Ljava.lang.String;") ] Integer]])
+
+(defmacro jna-call [lib func ret & args]
+  `(let [library#  (name ~lib)
+         function# (com.sun.jna.Function/getFunction library# ~func)]
+     (.invoke function# ~ret (to-array [~@args]))))
+
+(defmacro jna-malloc [size]
+  `(let [buffer# (java.nio.ByteBuffer/allocateDirect ~size)
+         pointer# (Native/getDirectBufferPointer buffer#)]
+     (.order buffer# java.nio.ByteOrder/LITTLE_ENDIAN)
+     {:pointer pointer# :buffer buffer#}))
+
 (defn -main []
+  (System/loadLibrary "gslist")
+  (println (System/getProperty "java.library.path"))
+  (let [gs (Native/loadLibrary "gslist" jna.GSLibrary)
+        args (into-array ["rr" "-n" "tribesv"])]
+    (println (jna-call :gslist "main" Integer 2 args)))
   (let [port (Integer/parseInt (System/getenv "PORT"))]
     (run-jetty handler {:port port})))
