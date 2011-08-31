@@ -54,7 +54,6 @@
 
 (defn -main []
   (System/loadLibrary "gslist")
-  (System/loadLibrary "GeoIP")
   (println (System/getProperty "java.library.path"))
   (let [gs (Native/loadLibrary "gslist" jna.GSLibrary)
         args (into-array ["rr" "-n" "tribesv"])]
