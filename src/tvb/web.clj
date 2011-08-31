@@ -5,7 +5,8 @@
   (:use tvb.utils)
   (:use tvb.domain)
   (:use tvb.net)
-  (:import (com.sun.jna Native)))
+  (:import (com.sun.jna Native))
+  (:import (java.io File)))
 
 (defn basic [server]
   (uask server "\\basic\\"))
@@ -53,8 +54,10 @@
      {:pointer pointer# :buffer buffer#}))
 
 (defn -main []
+  (println (str "lib exists " (.exists (File. "/lib"))))
+  (println (str "libc.so.6 exists " (.exists (File. "/lib/libc.so.6"))))
+  (System/loadLibrary "c")
   (System/loadLibrary "gslist")
-  (println (System/getProperty "java.library.path"))
   (let [gs (Native/loadLibrary "gslist" jna.GSLibrary)
         args (into-array ["rr" "-n" "tribesv"])]
     (println (jna-call :gslist "main" Integer 2 args)))
