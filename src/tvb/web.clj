@@ -56,7 +56,6 @@
 (defn -main []
   (println (str "lib exists " (.exists (File. "/lib"))))
   (println (str "libc.so.6 exists " (.exists (File. "/lib/libc.so.6"))))
-  (System/loadLibrary "c")
   (System/loadLibrary "gslist")
   (let [gs (Native/loadLibrary "gslist" jna.GSLibrary)
         args (into-array ["rr" "-n" "tribesv"])]
