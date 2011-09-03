@@ -14,14 +14,14 @@
 (defrecord Server [name admin game numplayers maxplayers password])
 
 (defn getPlayer [infos idx]
-  (Player. (get infos (str "player_" idx))
-           (get infos (str "ping_" idx))
+  (Player. (infos (str "player_" idx))
+           (infos (str "ping_" idx))
            (Integer/parseInt (get infos (str "score_" idx)))
-           (get infos (str "team_" idx))))
+           (infos (str "team_" idx))))
 
 (defn getTeam [infos idx]
-  (Team. (get infos (str "team" idx))
-         (get infos (str "team" idx "score"))))
+  (Team. (infos (str "team" idx))
+         (infos (str "team" idx "score"))))
 
 (defn getPlayers [infos team1 numplayers]
   (letfn [(playerIndex [team1 player]
@@ -62,4 +62,11 @@
         attributes (into baseAttributes (playerAttributes numPlayers))
         pattern    (toPattern attributes)
         infos      (rest (re-find pattern message)) ]
+    (apply hash-map (interleave attributes infos))))
+
+(def serverInfoPattern #"(.*):(.*) \\hostname\\(.*)\\numplayers\\(.*)\\maxplayers\\(.*)\\mapname\\(.*)")
+
+(defn serverInfoMap [message]
+  (let [infos      (rest (re-find serverInfoPattern message))
+        attributes ["ip" "port" "hostname" "numplayers" "maxplayers" "mapname"]]
     (apply hash-map (interleave attributes infos))))

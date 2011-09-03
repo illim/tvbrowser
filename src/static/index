@@ -1,6 +1,8 @@
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<title>Tribes vengeance Server Browser</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
 <!-- font from www.webpagepublicity.com -->
 <style type="text/css">
 @font-face {
@@ -33,8 +35,7 @@
  font-family: phoenix_font;
 }
 </style>
-</head>
-<script>//<![CDATA[
+<script type="text/javascript">//<![CDATA[
 var debug = ""
 
 function jsubst(pos, json){
@@ -64,18 +65,29 @@ function styledText(value, elem){
   }
 }
 
+function refresh(id, json){
+  var obj = $('#_' + id + '_tmpl').clone()
+  $('#' + id).empty();
+  jsubst(obj, json);
+  $('#' + id).append(obj.children())
+}
+
 $(document).ready(function() {
-  $("a").click(function(e) {
+  $("a").live('click', function(e) {
     debug = ""
     e.preventDefault();
     $('#spinner').show();
-    var server_info = $('#_server_info_tmpl').clone()
- 
-    $.getJSON($(this).attr("href"),
-      function(data) {
-        $('#server_info').empty();
-        jsubst(server_info, data);
-        $('#server_info').append(server_info.children())
+    href = $(this).attr("href")
+
+    $.getJSON(href,
+      function(json) {
+        if (href == "/list.json"){
+          $('#servers').empty();
+          $( "#serversTemplate" ).tmpl( json ).appendTo( "#servers" );
+        } else {
+           $('#server').empty();
+          $( "#serverTemplate" ).tmpl( json ).appendTo( "#server" );
+        }
       }).error(function(jx, txt, err) { alert(txt + "(" +err+ ") :" + jx.responseText); })
         .complete(function(){
           $('#spinner').hide();
@@ -83,53 +95,64 @@ $(document).ready(function() {
         });
   })
 
-$('#_server_info_tmpl').hide();
+function formatTeamClass(name){
+  return name.replace(' ', '') + "aze";
+}
+
+$('#_server_tmpl').hide();
+$('#_servers_tmpl').hide();
 $('#spinner').hide();
 });
 //]]></script>
-<body>
-<a href="/94.23.229.44/7778.json">Waking fields</a> - 
-<a href="/94.23.229.44/7780.json">Frenchie</a> - 
-<a href="/94.23.229.44/7782.json">Rox</a>
-<img src="/ajax-loader.gif" id="spinner"/>
-<div id="_server_info_tmpl">
-<div ><b><span class="name"></span></b> (Password? : <span class="password"></span>)</div>
-<div>Players : <span class="numplayers"></span> / <span class="maxplayers"></span> </div>
-<div class="admin" >
-Admin : <span class="name"></span> (<span class="email"></span>)
-</div>
-<div class="game">
-<div> Map : <span class="map"></span> (<span class="gametype"></span>)</div>
-<div> Scores :
- <span class="team1">
-  <span class="name coloured"></span>
-  <span class="score"></span>
- </span>
- <span class="team2">
-  <span class="name coloured"></span>
-  <span class="score" /></span>
- </span>
-</div>
-<br/>
-<div>
- <span class="players" style="display: table">
+
+<script id="serversTemplate" type="text/x-jquery-tmpl">
+  <li><a href="/${ip}/${port}.json">${hostname}</a> (${numplayers}/${maxplayers})</li>
+</script>
+
+<script id="serverTemplate" type="text/x-jquery-tmpl">
+ <div><b>${name}</b> (Password? : ${password})</div>
+ <div>Players : ${numplayers} / ${maxplayers}</div>
+ <div>{{tmpl(admin) "#adminTemplate"}}</div>
+ <div>{{tmpl(game) "#gameTemplate"}}</div>
+</script>
+
+<script id="adminTemplate" type="text/x-jquery-tmpl">Admin : ${name} (${email})</script>
+
+<script id="gameTemplate" type="text/x-jquery-tmpl">
+ <div>Map : ${map} (${gametype})</div>
+ <div>Scores : {{tmpl(team1) "#teamTemplate"}} / {{tmpl(team2) "#teamTemplate"}}</div>
+ <div class="players" style="display: table">
   <div style="display: table-row; font-weight:bold">
    <span class="cell">Player</span>
    <span class="cell">ping</span>
    <span class="cell">team</span>
    <span class="cell">score</span>
   </div>
-  <div class="subelem" style="display: table-row">
-   <span class="name cell" ></span>
-   <span class="ping cell" ></span>
-   <span class="team coloured cell" ></span>
-   <span class="score cell"></span>
+  {{tmpl(players) "#playerTemplate"}}
   </div>
- </span>
-</div>
-</div>
-</div>
-<div id="server_info"> </div>
-<span id="debug"></span>
+</script>
+
+<script id="teamTemplate" type="text/x-jquery-tmpl">
+  {{tmpl(name) "#teamNameTemplate"}} ${score}
+</script>
+<script id="teamNameTemplate" type="text/x-jquery-tmpl">
+ <span class='${$item.data.replace(" ", "")}' >${$item.data}</span>
+</script>
+
+<script id="playerTemplate" type="text/x-jquery-tmpl">
+  <div class="subelem" style="display: table-row">
+   <span class="cell" >${name}</span>
+   <span class="cell" >${ping}</span>
+   <span class="cell" >{{if team}}{{tmpl(team) "#teamNameTemplate"}}{{/if}}</span>
+   <span class="cell">${score}</span>
+  </div>
+</script>
+
+</head>
+<body>
+<a href="/list.json">Browse</a> <img src="/ajax-loader.gif" id="spinner"/>
+ <ul id="servers"></ul>
+ <div id="server"></div>
+ <span id="debug"></span>
 </body>
 </html>

@@ -17,3 +17,8 @@
 
 (defn t2 []
   (toJsonStr (serverInfos (tinfos))))
+
+(def exs "144.140.154.67:20001 \hostname\GameArena Tribes: Vengeance #1 [CTF]\numplayers\0\maxplayers\28\mapname\Isle")
+
+(defn t3 []
+  (serverInfoMap exs))

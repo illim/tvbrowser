@@ -5,8 +5,7 @@
   (:use tvb.utils)
   (:use tvb.domain)
   (:use tvb.net)
-  (:import (com.sun.jna Native))
-  (:import (java.io File)))
+  (:use tvb.gs))
 
 (defn basic [server]
   (uask server "\\basic\\"))
@@ -23,42 +22,33 @@
        (m-fmap #(plainText(toJsonStr(serverInfos(infoMap (basic %))))) server)
        (plainText "Unknown path") ))))
 
+(defn handleList []
+  (letfn [(index [{:strs [ip port numplayers]}] [(Integer/parseInt numplayers) ip port])]
+    (let [gsTvServers   (listServers "tribesv" "\\hostname\\numplayers\\maxplayers\\mapname")
+          tvServers     (map #(serverInfoMap %) gsTvServers)
+          sortTvServers (into (sorted-set-by #(compare (index %2) (index %1))) tvServers)]
+    (plainText (toJsonStr sortTvServers)))))
+
 (def statics
   (let [ m (mapResources "static")
-         indexResource (get m "/index") ]
+         indexResource (m "/index") ]
     (assoc m "/" indexResource)))
+
+(def coolDownServerCache (ref {}))
+(def coolDownServersCache (ref {}))
 
 (defn handler [req]
   (orElse
-   (get statics (:uri req))
-   (try
-     (coolDown handleJsonPath (jsonPath (:uri req)))
-     (catch Throwable t (do
-                          (.printStackTrace t)
-                          (plainText (str (.getClass t) (.getMessage t)) 503))))))
-
-(gen-interface
- :name jna.GSLibrary
- :extends [com.sun.jna.Library]
- :methods [[main [Integer #=(java.lang.Class/forName "[Ljava.lang.String;") ] Integer]])
-
-(defmacro jna-call [lib func ret & args]
-  `(let [library#  (name ~lib)
-         function# (com.sun.jna.Function/getFunction library# ~func)]
-     (.invoke function# ~ret (to-array [~@args]))))
-
-(defmacro jna-malloc [size]
-  `(let [buffer# (java.nio.ByteBuffer/allocateDirect ~size)
-         pointer# (Native/getDirectBufferPointer buffer#)]
-     (.order buffer# java.nio.ByteOrder/LITTLE_ENDIAN)
-     {:pointer pointer# :buffer buffer#}))
+   (statics (:uri req))
+   (cond
+    (= "/list.json" (:uri req)) (coolDown coolDownServersCache handleList)
+    :else
+    (try
+      (coolDown coolDownServerCache handleJsonPath (jsonPath (:uri req)))
+      (catch Throwable t (do
+                           (.printStackTrace t)
+                           (plainText (str (.getClass t) (.getMessage t)) 503)))))))
 
 (defn -main []
-  (println (str "lib exists " (.exists (File. "/lib"))))
-  (println (str "libc.so.6 exists " (.exists (File. "/lib/libc.so.6"))))
-  (System/loadLibrary "gslist")
-  (let [gs (Native/loadLibrary "gslist" jna.GSLibrary)
-        args (into-array ["rr" "-n" "tribesv"])]
-    (println (jna-call :gslist "main" Integer 2 args)))
   (let [port (Integer/parseInt (System/getenv "PORT"))]
     (run-jetty handler {:port port})))
