@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Tribes vengeance Server Browser</title>
+<title>TribesV Servers</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
 <!-- font from www.webpagepublicity.com -->
@@ -21,6 +21,20 @@
  display: table-cell;
  padding-right : 10px
 }
+a.grey:link {color:#CCCCCC;}
+a.grey:visited {color:#CCCCCC;}
+a.grey:hover {color:#CCCCCC;}
+a.grey:active {color:#CCCCCC;}
+li.green:before {
+display: marker;
+content: "\2022 ";
+color: green;
+}
+li.grey:before {
+display: marker;
+content: "\2022 ";
+color: grey;
+}
 .BloodEagle {
  color: #8A0829;
  font-weight: bold;
@@ -38,6 +52,13 @@
 <script type="text/javascript">//<![CDATA[
 var debug = ""
 
+function replace(name, json){
+  $('#'+name).hide()
+  $('#'+name).empty();
+  $('#'+name+'Template' ).tmpl( json ).appendTo('#' +name);
+  $('#'+name).fadeIn('fast', function(){});
+}
+
 $(document).ready(function() {
   $("a").live('click', function(e) {
     debug = ""
@@ -48,11 +69,9 @@ $(document).ready(function() {
     $.getJSON(href,
       function(json) {
         if (href == "/list.json"){
-          $('#servers').empty();
-          $( "#serversTemplate" ).tmpl( json ).appendTo( "#servers" );
+          replace('servers', json);
         } else {
-           $('#server').empty();
-          $( "#serverTemplate" ).tmpl( json ).appendTo( "#server" );
+          replace('server', json);
         }
       }).error(function(jx, txt, err) { alert(txt + "(" +err+ ") :" + jx.responseText); })
         .complete(function(){
@@ -61,14 +80,14 @@ $(document).ready(function() {
         });
   })
 
-$('#_server_tmpl').hide();
-$('#_servers_tmpl').hide();
 $('#spinner').hide();
 });
 //]]></script>
 
 <script id="serversTemplate" type="text/x-jquery-tmpl">
-  <li><a href="/${ip}/${port}.json">${hostname}</a> (${numplayers}/${maxplayers})</li>
+<li class='{{if numplayers>0 }}green{{else}}grey{{/if}}'>
+ <a {{if numplayers==0 }}class="grey"{{/if}} href="/${ip}/${port}.json">${hostname}</a> (${numplayers}/${maxplayers})
+</li>
 </script>
 
 <script id="serverTemplate" type="text/x-jquery-tmpl">
@@ -103,9 +122,9 @@ $('#spinner').hide();
 
 <script id="playerTemplate" type="text/x-jquery-tmpl">
   <div class="subelem" style="display: table-row">
-   <span class="cell" >${name}</span>
-   <span class="cell" >${ping}</span>
-   <span class="cell" >{{if team}}{{tmpl(team) "#teamNameTemplate"}}{{/if}}</span>
+   <span class="cell">${name}</span>
+   <span class="cell">${ping}</span>
+   <span class="cell">{{if team}}{{tmpl(team) "#teamNameTemplate"}}{{/if}}</span>
    <span class="cell">${score}</span>
   </div>
 </script>
@@ -113,7 +132,7 @@ $('#spinner').hide();
 </head>
 <body>
 <a href="/list.json">Browse</a> <img src="/ajax-loader.gif" id="spinner"/>
- <ul id="servers"></ul>
+ <ul id="servers" style="list-style-type: none;padding: 5;margin:0"></ul>
  <div id="server"></div>
  <span id="debug"></span>
 </body>

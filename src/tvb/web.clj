@@ -7,8 +7,7 @@
   (:use tvb.net)
   (:use tvb.gs))
 
-(defn basic [server]
-  (uask server "\\basic\\"))
+(def basic (partial uask "\\basic\\"))
 
 (defn plainText
   ([text] (plainText text 200))

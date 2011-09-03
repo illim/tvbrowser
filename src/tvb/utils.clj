@@ -46,6 +46,6 @@
      (let [delta (- (System/currentTimeMillis) time)]
        (cond
         (and (> delta timeBeforeRecompute) (< delta timeToLive) (== @dirty 0)) (swapAndCompute dirty current)
-        (> delta timeToLive) (compute)
+        (>= delta timeToLive) (compute)
         :else current))
      (compute)))))

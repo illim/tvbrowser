@@ -19,6 +19,6 @@
       (.receive packet))
     (new String (.getData packet) 0 (.getLength packet) "UTF-8") ))
 
-(defn uask [[ip port] cmd]
+(defn uask [cmd [ip port]]
   (with-open [^DatagramSocket socket (usend cmd ip port )]
     (urecv socket)))
