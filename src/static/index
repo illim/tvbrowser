@@ -98,7 +98,7 @@ $(document).ready(function() {
 
 <script id="serversTemplate" type="text/x-jquery-tmpl">
 <li class='{{if numplayers>0 }}green{{else}}grey{{/if}}'>
- <a {{if numplayers==0 }}class="grey"{{/if}} href="/${ip}/${port}.json">${hostname}</a> (${numplayers}/${maxplayers})
+ <a {{if numplayers==0 }}class="grey"{{/if}} href="/${ip}/${port}.json">${hostname}</a> <font {{if numplayers==0 }}color="lightgrey"{{/if}}>(${numplayers}/${maxplayers})</font>
 </li>
 </script>
 
