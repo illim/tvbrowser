@@ -38,40 +38,6 @@
 <script type="text/javascript">//<![CDATA[
 var debug = ""
 
-function jsubst(pos, json){
-  $.each(json, function(key, value) {
-   var elem = pos.find('.'+key).first();
-   if (value && typeof value === 'object') {
-     if(value.length) {
-       var tmpl = elem.find('.subelem').first();
-       $.each(value, function(k, v){
-         var newelem = tmpl.clone();
-         jsubst(newelem, v);
-         elem.append(newelem);
-       });
-     } else {
-       jsubst(elem, value)
-     }
-   } else {
-     styledText("" + value, elem);
-   }
-  });
-}
-
-function styledText(value, elem){
-  elem.text(value)
-  if (elem.hasClass('coloured')){
-   elem.addClass(value.replace(' ', ''))
-  }
-}
-
-function refresh(id, json){
-  var obj = $('#_' + id + '_tmpl').clone()
-  $('#' + id).empty();
-  jsubst(obj, json);
-  $('#' + id).append(obj.children())
-}
-
 $(document).ready(function() {
   $("a").live('click', function(e) {
     debug = ""
@@ -94,10 +60,6 @@ $(document).ready(function() {
           $('#debug').html(debug);
         });
   })
-
-function formatTeamClass(name){
-  return name.replace(' ', '') + "aze";
-}
 
 $('#_server_tmpl').hide();
 $('#_servers_tmpl').hide();
