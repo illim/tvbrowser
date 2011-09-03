@@ -59,28 +59,40 @@ function replace(name, json){
   $('#'+name).fadeIn('fast', function(){});
 }
 
+function toggleSpin(){
+ var base = "/ajax-loader.gif"
+ if ($('#spinner').attr('src') == base){
+  $('#spinner').attr('src', 'http://dl.dropbox.com/u/39786635/reload.png')
+ } else {
+  $('#spinner').attr('src', base)
+ }
+}
+
+function ask(href){
+  toggleSpin()
+  return $.getJSON(href,
+    function(json) {
+      if (href == "/list.json"){
+        replace('servers', json);
+      } else {
+        replace('server', json);
+      }
+    }).error(function(jx, txt, err) { alert(txt + "(" +err+ ") :" + jx.responseText); })
+      .complete(function(){
+        toggleSpin()
+        $('#debug').html(debug);
+      });
+}
+
 $(document).ready(function() {
+  toggleSpin()
+  ask("/list.json")
+
   $("a").live('click', function(e) {
     debug = ""
     e.preventDefault();
-    $('#spinner').show();
-    href = $(this).attr("href")
-
-    $.getJSON(href,
-      function(json) {
-        if (href == "/list.json"){
-          replace('servers', json);
-        } else {
-          replace('server', json);
-        }
-      }).error(function(jx, txt, err) { alert(txt + "(" +err+ ") :" + jx.responseText); })
-        .complete(function(){
-          $('#spinner').hide();
-          $('#debug').html(debug);
-        });
+    ask($(this).attr("href"));
   })
-
-$('#spinner').hide();
 });
 //]]></script>
 
@@ -131,7 +143,7 @@ $('#spinner').hide();
 
 </head>
 <body>
-<a href="/list.json">Browse</a> <img src="/ajax-loader.gif" id="spinner"/>
+<a id="refresh" href="/list.json"><img src="/ajax-loader.gif" id="spinner"/></a>
  <ul id="servers" style="list-style-type: none;padding: 5;margin:0"></ul>
  <div id="server"></div>
  <span id="debug"></span>
