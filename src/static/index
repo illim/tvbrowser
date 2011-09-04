@@ -65,6 +65,15 @@ function toggleSpin(){
  }
 }
 
+var lastselected = null;
+function switchSelected(link){
+  if (lastselected){
+    lastselected[0].css('background-color', lastselected[1]);
+  }
+  lastselected = new Array(link, link.css('background-color'));
+  link.css('background-color', '#FFCCCC')
+}
+
 function ask(href, targetId){
   toggleSpin()
   return $.getJSON(href,
@@ -83,7 +92,6 @@ function askServers(){
 $(document).ready(function() {
   toggleSpin()
   askServers()
-  var lastselected = null;
 
   $("a").live('click', function(e) {
     e.preventDefault();
@@ -91,11 +99,7 @@ $(document).ready(function() {
     if (href == "/list.json"){
       askServers()
     } else {
-      if (lastselected){
-        lastselected[0].css('background-color', lastselected[1]);
-      }
-      lastselected = new Array($(this), $(this).css('background-color'));
-      $(this).css('background-color', '#FFCCCC')
+      switchSelected($(this))
       ask(href, 'server');
     }
   })
@@ -103,13 +107,16 @@ $(document).ready(function() {
 //]]></script>
 
 <script id="serversTemplate" type="text/x-jquery-tmpl">
-<li class='{{if numplayers>0 }}green{{else}}grey{{/if}}'>
- <a {{if numplayers==0 }}class="grey"{{/if}} href="/${ip}/${port}.json">${hostname}</a> <font {{if numplayers==0 }}color="lightgrey"{{/if}}>(${numplayers}/${maxplayers})</font>
+{{if numplayers>0 }}
+<li class='green'><a href="/${ip}/${port}.json">${hostname}</a>(${numplayers}/${maxplayers})</li>
+{{else}}
+<li class='grey'><a class='grey' href="/${ip}/${port}.json">${hostname}</a><font color='lightgrey'>(${numplayers}/${maxplayers})</font></li>
+{{/if}}
 </li>
 </script>
 
 <script id="serverTemplate" type="text/x-jquery-tmpl">
- <div><b>${name}</b> (Password? : ${password})</div>
+ <div><b>${name}</b> {{if password}}<img src="http://dl.dropbox.com/u/39786635/lock.png"/>{{/if}} </div>
  <div>Players : ${numplayers} / ${maxplayers}</div>
  <div>{{tmpl(admin) "#adminTemplate"}}</div>
  <div>{{tmpl(game) "#gameTemplate"}}</div>
