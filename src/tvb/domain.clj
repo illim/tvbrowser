@@ -47,7 +47,7 @@
   (Integer/parseInt (second (re-find #".*\\numplayers\\([^\\]*)\\.*" message) )))
 
 (defn toRegex [attributes]
-  (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" attributes)) "\\\\(.*)final.*"))
+  (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" attributes)) "\\\\(.*)\\\\final.*"))
 
 (def baseAttributes
    [ "mapname", "numplayers", "maxplayers", "hostname", "hostport", "gametype", "gamever", "password", "gamename", "gamemode", "teamone", "teamtwo", "teamonescore", "teamtwoscore", "adminname", "adminemail", "p","trackingstats", "dedicated" ])
