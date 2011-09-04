@@ -5,6 +5,10 @@
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
 <!-- font from www.webpagepublicity.com -->
 <style type="text/css">
+body {
+  background-image: url("http://dl.dropbox.com/u/39786635/phoenix.jpg");
+  background-repeat: no-repeat;
+}
 @font-face {
  font-family: phoenix_font;
  src: url('http://dl.dropbox.com/u/39786635/alexisitalic.ttf');
@@ -32,7 +36,7 @@ color: green;
 li.grey:before {
 display: marker;
 content: "\2022 ";
-color: grey;
+color: lightgrey;
 }
 .BloodEagle {
  color: #8A0829;
@@ -116,7 +120,7 @@ $(document).ready(function() {
 </script>
 
 <script id="serverTemplate" type="text/x-jquery-tmpl">
- <div><b>${name}</b> {{if password}}<img src="http://dl.dropbox.com/u/39786635/lock.png"/>{{/if}} </div>
+ <div><b>${name}</b>{{if password}}<img src="http://dl.dropbox.com/u/39786635/lock.png"/>{{/if}}</div>
  <div>Players : ${numplayers} / ${maxplayers}</div>
  <div>{{tmpl(admin) "#adminTemplate"}}</div>
  <div>{{tmpl(game) "#gameTemplate"}}</div>

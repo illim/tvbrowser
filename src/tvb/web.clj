@@ -25,7 +25,7 @@
   (letfn [(index [{:strs [ip port numplayers]}] [(Integer/parseInt numplayers) ip port])]
     (let [gsTvServers   (listServers "tribesv" "\\hostname\\numplayers\\maxplayers\\mapname")
           tvServers     (map #(serverInfoMap %) gsTvServers)
-          sortTvServers (into (sorted-set-by #(compare (index %2) (index %1))) tvServers)]
+          sortTvServers (reverse (sort-by index tvServers))]
     (plainText (toJsonStr sortTvServers)))))
 
 (def statics

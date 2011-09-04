@@ -46,11 +46,11 @@
 (defn extractNumPlayers [message]
   (Integer/parseInt (second (re-find #".*\\numplayers\\([^\\]*)\\.*" message) )))
 
-(defn toPattern [attributes]
-  (Pattern/compile (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" attributes)) "\\\\(.*)\\\\final.*")))
+(defn toRegex [attributes]
+  (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" attributes)) "\\\\(.*)final.*"))
 
 (def baseAttributes
-   [ "mapname", "numplayers", "maxplayers", "hostname", "hostport", "gametype", "gamever", "password", "gamename", "gamemode", "gamevariant", "teamone", "teamtwo", "teamonescore", "teamtwoscore", "adminname", "adminemail", "p","trackingstats", "dedicated", "minver" ])
+   [ "mapname", "numplayers", "maxplayers", "hostname", "hostport", "gametype", "gamever", "password", "gamename", "gamemode", "teamone", "teamtwo", "teamonescore", "teamtwoscore", "adminname", "adminemail", "p","trackingstats", "dedicated" ])
 
 (defn playerAttributes [numPlayers]
   (for [f (map #(fn [x] (str % "_" x)) ["player", "ping", "score", "team"])
@@ -60,8 +60,8 @@
 (defn infoMap [message]
   (let [numPlayers (extractNumPlayers message)
         attributes (into baseAttributes (playerAttributes numPlayers))
-        pattern    (toPattern attributes)
-        infos      (rest (re-find pattern message)) ]
+        regex      (toRegex attributes)
+        infos      (rest (re-find (Pattern/compile regex) message)) ]
     (apply hash-map (interleave attributes infos))))
 
 (def serverInfoPattern #"(.*):(.*) \\hostname\\(.*)\\numplayers\\(.*)\\maxplayers\\(.*)\\mapname\\(.*)")
