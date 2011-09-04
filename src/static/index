@@ -61,7 +61,7 @@ function replace(name, json){
 }
 
 function toggleSpin(){
- var base = "/ajax-loader.gif"
+ var base = "http://dl.dropbox.com/u/39786635/ajax-loader.gif"
  if ($('#spinner').attr('src') == base){
   $('#spinner').attr('src', 'http://dl.dropbox.com/u/39786635/reload.png')
  } else {
@@ -160,7 +160,7 @@ $(document).ready(function() {
 
 </head>
 <body>
-<a id="refresh" href="/list.json"><img src="/ajax-loader.gif" id="spinner"/></a>
+<a id="refresh" href="/list.json"><img src="http://dl.dropbox.com/u/39786635/ajax-loader.gif" id="spinner"/></a>
  <ul id="servers" style="list-style-type: none;padding: 5;margin:0"></ul>
  <div id="server"></div>
 </body>
