@@ -21,10 +21,9 @@
  display: table-cell;
  padding-right : 10px
 }
-a.grey:link {color:#CCCCCC;}
-a.grey:visited {color:#CCCCCC;}
-a.grey:hover {color:#CCCCCC;}
-a.grey:active {color:#CCCCCC;}
+a.grey:link {color:lightgrey;}
+a.grey:visited {color:lightgrey;}
+a.grey:hover {color:lightgrey;}
 li.green:before {
 display: marker;
 content: "\2022 ";
@@ -50,8 +49,6 @@ color: grey;
 }
 </style>
 <script type="text/javascript">//<![CDATA[
-var debug = ""
-
 function replace(name, json){
   $('#'+name).hide()
   $('#'+name).empty();
@@ -68,30 +65,39 @@ function toggleSpin(){
  }
 }
 
-function ask(href){
+function ask(href, targetId){
   toggleSpin()
   return $.getJSON(href,
     function(json) {
-      if (href == "/list.json"){
-        replace('servers', json);
-      } else {
-        replace('server', json);
-      }
+      replace(targetId, json)
     }).error(function(jx, txt, err) { alert(txt + "(" +err+ ") :" + jx.responseText); })
       .complete(function(){
         toggleSpin()
-        $('#debug').html(debug);
       });
+}
+
+function askServers(){
+  ask("/list.json", 'servers')
 }
 
 $(document).ready(function() {
   toggleSpin()
-  ask("/list.json")
+  askServers()
+  var lastselected = null;
 
   $("a").live('click', function(e) {
-    debug = ""
     e.preventDefault();
-    ask($(this).attr("href"));
+    var href = $(this).attr("href")
+    if (href == "/list.json"){
+      askServers()
+    } else {
+      if (lastselected){
+        lastselected[0].css('background-color', lastselected[1]);
+      }
+      lastselected = new Array($(this), $(this).css('background-color'));
+      $(this).css('background-color', '#FFCCCC')
+      ask(href, 'server');
+    }
   })
 });
 //]]></script>
@@ -146,6 +152,5 @@ $(document).ready(function() {
 <a id="refresh" href="/list.json"><img src="/ajax-loader.gif" id="spinner"/></a>
  <ul id="servers" style="list-style-type: none;padding: 5;margin:0"></ul>
  <div id="server"></div>
- <span id="debug"></span>
 </body>
 </html>
