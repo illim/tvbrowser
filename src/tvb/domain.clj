@@ -1,7 +1,6 @@
 (ns tvb.domain
   (:import (java.util.regex Pattern))
-  (:use tvb.utils)
-  (:use clojure.contrib.monads))
+  (:use tvb.utils))
 
 (defrecord Player [name ping score team])
 
@@ -11,7 +10,7 @@
 
 (defrecord Game [map gametype team1 team2 players])
 
-(defrecord Server [name admin game numplayers maxplayers password])
+(defrecord Board [name admin game numplayers maxplayers password])
 
 (defn getPlayer [infos idx]
   (Player. (infos (str "player_" idx))
@@ -24,23 +23,23 @@
          (infos (str "team" idx "score"))))
 
 (defn getPlayers [infos team1 numplayers]
-  (letfn [(playerIndex [team1 player]
+  (letfn [(team-player [player]
             [(= (:name team1) (:team player)) (:score player) (:name player)])]
-    (loop [result (sorted-set-by #(compare (playerIndex team1 %2) (playerIndex team1 %1)) []) idx numplayers]
+    (loop [result (sorted-set-by (->> compare (by team-player) flip) []) idx numplayers]
       (if (zero? idx)
         result
         (recur (conj result (getPlayer infos (- idx 1))) (dec idx))))))
 
-(defn serverInfos [{:strs [numplayers maxplayers password mapname gametype hostname adminname adminemail] :as infos}]
+(defn toScoreBoard [{:strs [numplayers maxplayers password mapname gametype hostname adminname adminemail] :as infos}]
   (let [nump          (Integer/parseInt numplayers)
         [team1 team2] (map #(getTeam infos %) ["one" "two"])
         players       (getPlayers infos team1 nump)]
-    (Server. hostname
-             (Admin. adminname adminemail)
-             (Game. mapname gametype team1 team2 players)
-             nump
-             (Integer/parseInt maxplayers)
-             (not= "0" password))))
+    (Board. hostname
+            (Admin. adminname adminemail)
+            (Game. mapname gametype team1 team2 players)
+            nump
+            (Integer/parseInt maxplayers)
+            (not= "0" password))))
 
 
 (defn extractNumPlayers [message]
@@ -57,7 +56,7 @@
         n (range 0 numPlayers)]
     (f n)))
 
-(defn infoMap [message]
+(defn parseScores [message]
   (let [numPlayers (extractNumPlayers message)
         attributes (into baseAttributes (playerAttributes numPlayers))
         regex      (toRegex attributes)
@@ -66,7 +65,7 @@
 
 (def serverInfoPattern #"(.*):(.*) \\hostname\\(.*)\\numplayers\\(.*)\\maxplayers\\(.*)\\mapname\\(.*)")
 
-(defn serverInfoMap [message]
+(defn parseServerInfo [message]
   (let [infos      (rest (re-find serverInfoPattern message))
         attributes ["ip" "port" "hostname" "numplayers" "maxplayers" "mapname"]]
     (apply hash-map (interleave attributes infos))))

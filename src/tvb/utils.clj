@@ -15,6 +15,13 @@
           fileNames (map #(str "/" (.getName ^File %)) (seq (.listFiles dir))) ]
       (zipmap fileNames (map toResourceResponseCall fileNames)))))
 
+(defmacro flip [f]
+  "flip f arguments"
+  `(fn [& args#] (apply ~f (reverse args#))))
+
+(defmacro by [f g]
+  "map f to arguments of g"
+  `(fn [& args#] (apply ~g (map ~f args#))))
 
 (defn toJsonStr [x]
   (with-open [sw (StringWriter.)

@@ -12,15 +12,15 @@
 (comment (ask ["94.23.229.44" 7782]))
 
 (defn tinfos []
-  (infoMap ex))
+  (parseScores ex))
 
 (defn t1 []
   (toJsonStr (tinfos)))
 
 (defn t2 []
-  (toJsonStr (serverInfos (tinfos))))
+  (toJsonStr (toScoreBoard (tinfos))))
 
 (def exs "144.140.154.67:20001 \\hostname\\GameArena Tribes: Vengeance #1 [CTF]\\numplayers\\0\\maxplayers\\28\\mapname\\Isle")
 
 (defn t3 []
-  (serverInfoMap exs))
+  (parseServerInfo exs))
