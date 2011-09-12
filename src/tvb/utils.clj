@@ -1,5 +1,6 @@
 (ns tvb.utils
   (:use clojure.contrib.json)
+  (:use clojure.contrib.def)
   (:import (java.io PrintWriter StringWriter))
   (:import (java.io File)))
 
@@ -33,8 +34,8 @@
   (let [[[ _ path]] (re-seq #"/(.*)\.json" path )]
     path))
 
-(def ^{:private true} timeBeforeRecompute 4000)
-(def ^{:private true} timeToLive 8000)
+(defvar- timeBeforeRecompute 4000)
+(defvar- timeToLive 8000)
 
 (defn coolDown [coolDownMap f & args]
   "Dummy cache that somewhat cools down the hammering of the game server if there's a lot of demands. There still is a possibility to flood the game server every 'timeToLive' seconds."

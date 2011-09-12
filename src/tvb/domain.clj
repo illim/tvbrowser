@@ -2,7 +2,7 @@
   (:import (java.util.regex Pattern))
   (:use tvb.utils))
 
-(defrecord Player [name ping score team])
+(defrecord Player [name ping #^int score team])
 
 (defrecord Team [name score])
 
@@ -15,7 +15,7 @@
 (defn getPlayer [infos idx]
   (Player. (infos (str "player_" idx))
            (infos (str "ping_" idx))
-           (Integer/parseInt (get infos (str "score_" idx)))
+           (Integer/parseInt (infos (str "score_" idx)))
            (infos (str "team_" idx))))
 
 (defn getTeam [infos idx]
@@ -61,11 +61,11 @@
         attributes (into baseAttributes (playerAttributes numPlayers))
         regex      (toRegex attributes)
         infos      (rest (re-find (Pattern/compile regex) message)) ]
-    (apply hash-map (interleave attributes infos))))
+    (zipmap attributes infos)))
 
 (def serverInfoPattern #"(.*):(.*) \\hostname\\(.*)\\numplayers\\(.*)\\maxplayers\\(.*)\\mapname\\(.*)")
 
 (defn parseServerInfo [message]
   (let [infos      (rest (re-find serverInfoPattern message))
         attributes ["ip" "port" "hostname" "numplayers" "maxplayers" "mapname"]]
-    (apply hash-map (interleave attributes infos))))
+    (zipmap attributes infos)))
