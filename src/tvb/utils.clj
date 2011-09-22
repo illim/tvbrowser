@@ -1,20 +1,22 @@
 (ns tvb.utils
+  (:use clojure.contrib.core)
   (:use clojure.contrib.json)
   (:use clojure.contrib.def)
   (:import (java.io PrintWriter StringWriter))
   (:import (java.io File)))
 
+(defn debug [value] (do (pr '>>)(pr value)(prn '<<) value))
 
 (defmacro orElse [x y]
   `(if-let [z# ~x] z# ~y))
 
 
-(defmacro mapResources [folder]
-  (letfn [(toResourceResponseCall [fileName]
+(defmacro resourcesFrom [folder]
+  (letfn [(asResourceResponse [fileName]
             (list 'resource-response (str "/" folder fileName)))]
     (let [ dir (File. (str "src/" folder))
           fileNames (map #(str "/" (.getName ^File %)) (seq (.listFiles dir))) ]
-      (zipmap fileNames (map toResourceResponseCall fileNames)))))
+      (zipmap fileNames (map asResourceResponse fileNames)))))
 
 (defmacro flip [f]
   "flip f arguments"
@@ -23,6 +25,7 @@
 (defmacro by [f g]
   "map f to arguments of g"
   `(fn [& args#] (apply ~g (map ~f args#))))
+
 
 (defn toJsonStr [x]
   (with-open [sw (StringWriter.)

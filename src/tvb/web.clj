@@ -27,9 +27,9 @@
     (->> tvServers (sort-by player-ip-port (flip compare)) toJsonStr asPlainText))))
 
 (def statics
-  (let [ m (mapResources "static")
-         indexResource (m "/index") ]
-    (assoc m "/" indexResource)))
+  (let [ m (resourcesFrom "static")
+         home (m "/index") ]
+    (assoc m "/" home)))
 
 (def coolDownServerCache (ref {}))
 (def coolDownServersCache (ref {}))
@@ -49,3 +49,4 @@
 (defn -main []
   (let [port (Integer/parseInt (System/getenv "PORT"))]
     (run-jetty handler {:port port})))
+
