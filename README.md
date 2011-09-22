@@ -1,0 +1,1 @@
+My first clojure project with some absurd code.
