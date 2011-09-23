@@ -4,7 +4,7 @@
   [[org.clojure/clojure "1.2.1"]
    [org.clojure/clojure-contrib "1.2.0"]
    [ring/ring-jetty-adapter "0.3.9"]
-   [org.clojars.ohpauleez/fnparse "3.0.0alpha4"]
+;   [org.clojars.ohpauleez/fnparse "3.0.0alpha4"]
    [net.java.dev.jna/jna "3.3.0"]]
 
   :jvm-opts ["-Djna.library.path=native/linux/x86_64"]

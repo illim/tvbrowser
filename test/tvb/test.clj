@@ -1,5 +1,4 @@
 (ns tvb.test
-  (:use edu.arizona.fnparse.cat)
   (:use :reload-all tvb.web)
   (:use :reload-all tvb.utils)
   (:use :reload-all tvb.refl)
@@ -30,11 +29,3 @@
 
 (defn t3 []
   (parseServerInfo exs))
-
-(defn tp2 []
-  (let [metas (recordArgs "domain.clj")]
-    metas))
-
-;(prn (t2))
-
-;(prn (class ((((tp2) "Player") "score") :tag)))
