@@ -29,3 +29,5 @@
 
 (defn t3 []
   (parseServerInfo exs))
+
+(prn (t2))

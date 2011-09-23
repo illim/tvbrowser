@@ -14,7 +14,7 @@
 (defrecord Board [name admin game numplayers maxplayers password])
 
 (defn getPlayer [infos idx]
-  (xPlayer (map #(infos (str % "_" idx)) ["player" "ping" "score" "team"])))
+  (xPlayer (map #(infos (str % "_" idx)) ["player" "ping" "score" "team"]) :coerce))
 
 (defn getTeam [infos idx]
   (xTeam (map #(infos (str "team" idx %)) ["" "score"])))

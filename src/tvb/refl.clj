@@ -22,15 +22,18 @@
 (defmacro defrecordx [typeName fieldList]
   "crappy functional/formatter constructor"
   (let [consxName     (symbol (str "x" typeName))
+        dummy         (symbol (str "xdummy" typeName))
         argMetas      (map #(meta %) fieldList)
         consKeys      (map #(keyword (str %)) fieldList)
         defaults      (map default argMetas)
         argFormatters (map formatter argMetas)]
     `(do
        (defrecord ~typeName ~fieldList)
-       (defn ~consxName [args#]
-         (into (new ~typeName ~@defaults) (zipmap '~consKeys (formatArgs [~@argFormatters] args#)))
-         ))))
+       (def ~dummy (new ~typeName ~@defaults))
+       (defn ~consxName [args# & opts#]
+         (let [finalArgs# (if (some #{:coerce} opts#) (formatArgs [~@argFormatters] args#) args#)]
+           (into ~dummy (zipmap '~consKeys finalArgs#))
+         )))))
 
 
 ;Some stupid code (parsing clj file to find metadata)
