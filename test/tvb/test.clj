@@ -19,8 +19,9 @@
 (defn t1 []
   (toJsonStr (tinfos)))
 
-(def infos {"player_0" "machin" "ping_0" "2" "score_0" "3" "team_0" "be" })
-(prn (macroexpand '(construct Player (map #(infos (str % "_" 0)) ["player" "ping" "score" "team"]))))
+;(def infos {"player_0" "machin" "ping_0" "2" "score_0" "3" "team_0" "be" })
+;(prn (macroexpand '(defrecordx Player [name ping #^int score team])))
+;(prn (macroexpand '(construct Player (map #(infos (str % "_" 0)) ["player" "ping" "score" "team"]))))
 
 (defn t2 []
   (toJsonStr (toScoreBoard (tinfos))))
@@ -34,6 +35,6 @@
   (let [metas (recordArgs "domain.clj")]
     metas))
 
-(prn (t2))
+;(prn (t2))
 
-(prn (class ((((tp2) "Player") "score") :tag)))
+;(prn (class ((((tp2) "Player") "score") :tag)))

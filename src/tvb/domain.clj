@@ -3,9 +3,9 @@
   (:use tvb.refl)
   (:use tvb.utils))
 
-(defrecord Player [name ping #^int score team])
+(defrecordx Player [name ping #^int score team])
 
-(defrecord Team [name score])
+(defrecordx Team [name score])
 
 (defrecord Admin [name email])
 
@@ -14,10 +14,10 @@
 (defrecord Board [name admin game numplayers maxplayers password])
 
 (defn getPlayer [infos idx]
-  (construct Player (map #(infos (str % "_" idx)) ["player" "ping" "score" "team"])))
+  (xPlayer (map #(infos (str % "_" idx)) ["player" "ping" "score" "team"])))
 
 (defn getTeam [infos idx]
-  (construct Team (map #(infos (str "team" idx %)) ["" "score"])))
+  (xTeam (map #(infos (str "team" idx %)) ["" "score"])))
 
 (defn getPlayers [infos team1 numplayers]
   (letfn [(team-player [player]

@@ -3,23 +3,7 @@
   (:use tvb.utils)
   (:import (java.io File)))
 
-(defn- metaArgs [forms]
-  (letfn [(
-           argsMeta [args] (map #(vector (str %) (meta %)) args)
-            )]
-    (let [recordForms (filter #(.equals (first %) 'defrecord) forms )]
-      (into {} (map #(vector (str (second %)) (into (array-map) (argsMeta (nth % 2)))) recordForms) ))))
-
-(defmacro recordArgs [f]
-  (let [source (str "[" (slurp (File. (str "src/tvb/" f))) "]")
-        forms (read-string source)]
-    (metaArgs forms) ))
-
-
-(defn cleanRefString [ref] (let [[[ _ clean ]] (re-seq #"(.*)@.*" ref )] clean))
-
-(defn isInt [data]
-  (and data (.equals (.getCanonicalName (class int)) (cleanRefString (str data)))))
+(defn isInt [data] (and data (.equals data 'int)))
 
 (def intFormatter #(Integer/parseInt %))
 
@@ -36,10 +20,39 @@
 (defn formatArgs [formatters args]
   (map-indexed #((nth formatters %1) %2) args))
 
-(def domainRecordArgs (recordArgs "domain.clj") )
 
-(defmacro construct [typeNameSym args]
-  "Dummy functional constructor (record file/formatters hardcoded and no namespace management)"
+(defmacro defrecordx [typeName fieldList]
+  "crappy functional/formatter constructor"
+  (let [consxName     (symbol (str "x" typeName))
+        argMetas      (map #(meta %) fieldList)
+        consKeys      (map #(keyword (str %)) fieldList)
+        defaults      (map default argMetas)
+        argFormatters (map formatter argMetas)]
+    `(do
+       (defrecord ~typeName ~fieldList)
+       (defn ~consxName [args#]
+         (into (new ~typeName ~@defaults) (zipmap '~consKeys (formatArgs [~@argFormatters] args#)))
+         ))))
+
+
+;Some stupid code (parsing clj file to find metadata)
+
+(defn- metaArgs [forms]
+  (letfn [(
+           argsMeta [args] (map #(vector (str %) (meta %)) args)
+            )]
+    (let [recordForms (filter #(.equals (first %) 'defrecord) forms )]
+      (into {} (map #(vector (str (second %)) (into (array-map) (argsMeta (nth % 2)))) recordForms) ))))
+
+(defmacro recordArgs [f]
+  (let [source (str "[" (slurp (File. (str "src/tvb/" f))) "]")
+        forms (read-string source)]
+    (metaArgs forms) ))
+
+(defn cleanRefString [ref] (let [[[ _ clean ]] (re-seq #"(.*)@.*" ref )] clean))
+
+(defmacro construct [typeNameSym args domainRecordArgs]
+  "Dummy functional/formatter constructor (record file/formatters hardcoded and no namespace management)"
   (let [typeName      (str typeNameSym)
         consArgs      (domainRecordArgs typeName)
         consKeys      (map #(keyword %) (keys consArgs))
