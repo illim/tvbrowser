@@ -10,14 +10,6 @@
 (defmacro orElse [x y]
   `(if-let [z# ~x] z# ~y))
 
-
-(defmacro resourcesFrom [folder]
-  (letfn [(asResourceResponse [fileName]
-            (list 'resource-response (str "/" folder fileName)))]
-    (let [ dir (File. (str "src/" folder))
-          fileNames (map #(str "/" (.getName ^File %)) (seq (.listFiles dir))) ]
-      (zipmap fileNames (map asResourceResponse fileNames)))))
-
 (defmacro flip [f]
   "flip f arguments"
   `(fn [& args#] (apply ~f (reverse args#))))
@@ -33,9 +25,16 @@
     (write-json x pw)
     (.toString sw)))
 
-(defn jsonPath [path]
-  (let [[[ _ path]] (re-seq #"/(.*)\.json" path )]
-    path))
+(defn jsonPath [path] (second (first (re-seq #"/(.*)\.json" path ))))
+
+
+(defmacro resourcesFrom [folder]
+  (letfn [(asResourceResponse [fileName]
+            (list 'resource-response (str "/" folder fileName)))]
+    (let [ dir (File. (str "src/" folder))
+          fileNames (map #(str "/" (.getName ^File %)) (seq (.listFiles dir))) ]
+      (zipmap fileNames (map asResourceResponse fileNames)))))
+
 
 (defvar- timeBeforeRecompute 4000)
 (defvar- timeToLive 8000)
@@ -60,3 +59,5 @@
         (>= delta timeToLive) (compute)
         :else current))
      (compute)))))
+
+(defn cooler [] (partial coolDown (ref {})))

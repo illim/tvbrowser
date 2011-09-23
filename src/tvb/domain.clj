@@ -1,6 +1,6 @@
 (ns tvb.domain
   (:import (java.util.regex Pattern))
-  (:use tvb.refl)
+  (:use tvb.recordx)
   (:use tvb.utils))
 
 (defrecordx Player [name ping #^int score team])
@@ -11,7 +11,7 @@
 (defrecord Board [name admin game numplayers maxplayers password])
 
 
-(defn getPlayers [infos team1 numplayers]
+(defn toPlayers [infos team1 numplayers]
   (letfn [(getPlayer [idx] (xPlayer (map #(infos (str % "_" idx)) ["player" "ping" "score" "team"]) :coerce))
           (team-player [player]
             [(= (:name team1) (:team player)) (:score player) (:name player)])]
@@ -24,7 +24,7 @@
   (letfn [(getTeam [idx] (xTeam (map #(infos (str "team" idx %)) ["" "score"])))]
     (let [nump          (Integer/parseInt numplayers)
           [team1 team2] [(getTeam "one") (getTeam "two")]
-          players       (getPlayers infos team1 nump)]
+          players       (toPlayers infos team1 nump)]
       (Board. hostname
               (Admin. adminname adminemail)
               (Game. mapname gametype team1 team2 players)
