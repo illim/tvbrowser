@@ -5,28 +5,21 @@
 
 (def intFormatter #(Integer/parseInt %))
 
-(defn formatter [{data :tag}]
-  (cond
-   (.equals 'int data) 'tvb.refl/intFormatter
-   :else 'clojure.core/identity))
-
-(defn default [{data :tag}]
-  (cond
-   (.equals 'int data) 0
-   :else nil))
+(def typeInfos
+  {'int {:formatter 'tvb.refl/intFormatter :default 0}
+    nil {:formatter 'clojure.core/identity :default nil}})
 
 (defn formatArgs [formatters args]
   (map-indexed #((nth formatters %1) %2) args))
 
-
 (defmacro defrecordx [typeName fieldList]
-  "crappy functional/formatter constructor"
+  "crappy functional constructor/formatter"
   (let [consxName     (symbol (str "x" typeName))
         dummy         (symbol (str "xdummy" typeName))
         argMetas      (map #(meta %) fieldList)
         consKeys      (map #(keyword (str %)) fieldList)
-        defaults      (map default argMetas)
-        argFormatters (map formatter argMetas)]
+        defaults      (map #(:default (typeInfos (:tag %))) argMetas)
+        argFormatters (map #(:formatter (typeInfos (:tag %))) argMetas)]
     `(do
        (defrecord ~typeName ~fieldList)
        (def ~dummy (new ~typeName ~@defaults))
@@ -53,7 +46,7 @@
 ;(defn cleanRefString [ref] (let [[[ _ clean ]] (re-seq #"(.*)@.*" ref )] clean))
 ;
 ;(defmacro construct [typeNameSym args domainRecordArgs]
-;  "Dummy functional/formatter constructor (record file/formatters hardcoded and no namespace management)"
+;  "Dummy functional constructor/formatter (record file/formatters hardcoded and no namespace management)"
 ;  (let [typeName      (str typeNameSym)
 ;        consArgs      (domainRecordArgs typeName)
 ;        consKeys      (map #(keyword %) (keys consArgs))
