@@ -12,18 +12,18 @@
 
 
 (defn toPlayers [infos team1 numplayers]
-  (letfn [(getPlayer [idx] (xPlayer (map #(infos (str % "_" idx)) ["player" "ping" "score" "team"]) :coerce))
+  (letfn [(toPlayer [idx] (xPlayer (map #(infos (str % "_" idx)) ["player" "ping" "score" "team"]) :coerce))
           (team-player [player]
             [(= (:name team1) (:team player)) (:score player) (:name player)])]
     (loop [result (sorted-set-by (->> compare (by team-player) flip) []) idx numplayers]
       (if (zero? idx)
         result
-        (recur (conj result (getPlayer (- idx 1))) (dec idx))))))
+        (recur (conj result (toPlayer (- idx 1))) (dec idx))))))
 
 (defn toScoreBoard [{:strs [numplayers maxplayers password mapname gametype hostname adminname adminemail] :as infos}]
-  (letfn [(getTeam [idx] (xTeam (map #(infos (str "team" idx %)) ["" "score"])))]
+  (letfn [(toTeam [idx] (xTeam (map #(infos (str "team" idx %)) ["" "score"])))]
     (let [nump          (Integer/parseInt numplayers)
-          [team1 team2] [(getTeam "one") (getTeam "two")]
+          [team1 team2] [(toTeam "one") (toTeam "two")]
           players       (toPlayers infos team1 nump)]
       (Board. hostname
               (Admin. adminname adminemail)
@@ -42,9 +42,9 @@
 
 (defn parseScores [message]
   (letfn [(playerAttributes [numPlayers]
-            (for [f (map #(fn [x] (str % "_" x)) ["player", "ping", "score", "team"])
-                  n (range 0 numPlayers)]
-              (f n)))]
+            (for [suffix ["player", "ping", "score", "team"]
+                  n      (range 0 numPlayers)]
+              (str suffix "_" n)))]
     (let [numPlayers (extractNumPlayers message)
           attributes (into baseAttributes (playerAttributes numPlayers))
           regex      (toRegex attributes)
