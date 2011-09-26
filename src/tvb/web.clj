@@ -1,7 +1,7 @@
 (ns tvb.web
   (:use ring.adapter.jetty)
   (:use ring.util.response)
-  (:use clojure.contrib.core)
+  (:use clojure.core.incubator)
   (:use tvb.utils)
   (:use tvb.domain)
   (:use tvb.net)

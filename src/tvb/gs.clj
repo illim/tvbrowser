@@ -23,5 +23,5 @@
         p      (proxy [tvb.gs.GSCallback] []
                  (invoke [message] (dosync (commute buf conj message))))]
     (do
-      (.main_with_cb libgslist 5 gsArgs p)
+      (.main_with_cb libgslist (Integer. 5) gsArgs p)
       @buf)))

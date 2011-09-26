@@ -1,6 +1,7 @@
 (ns tvb.domain
   (:import (java.util.regex Pattern))
   (:use tvb.recordx)
+  (:use [clojure.string :only [join]])
   (:use tvb.utils))
 
 (defrecordx Player [name ping #^int score team])
@@ -34,7 +35,7 @@
 
 
 (defn extractNumPlayers [message]     (Integer/parseInt (second (re-find #".*\\numplayers\\([^\\]*)\\.*" message) )))
-(defn toRegex           [attributes]  (str "\\\\" (apply str (interpose "\\\\(.*)\\\\" attributes)) "\\\\(.*)\\\\final.*"))
+(defn toRegex           [attributes]  (str "\\\\" (join "\\\\(.*)\\\\" attributes) "\\\\(.*)\\\\final.*"))
 (def serverInfoPattern #"(.*):(.*) \\hostname\\(.*)\\numplayers\\(.*)\\maxplayers\\(.*)\\mapname\\(.*)")
 (def baseAttributes
    [ "mapname", "numplayers", "maxplayers", "hostname", "hostport", "gametype", "gamever", "password", "gamename", "gamemode", "teamone", "teamtwo", "teamonescore", "teamtwoscore", "adminname", "adminemail", "p","trackingstats", "dedicated" ])
