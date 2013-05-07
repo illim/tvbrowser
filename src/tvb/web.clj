@@ -27,11 +27,8 @@
 
 (defn handleList []
   (letfn [(player-ip-port [{:strs [ip port numplayers]}] [(Integer/parseInt numplayers) ip port])]
-    (let [gsTvServers (listServers "tribesv" "\\hostname\\numplayers\\maxplayers\\mapname")
-          tvServers   (map parseServerInfo gsTvServers)]
+    (let [tvServers (hardList)]
     (->> tvServers (sort-by player-ip-port (flip compare)) toJsonStr asPlainText))))
-
-
 
 (def coolDownServer (cooler))
 (def coolDownServers (cooler))

@@ -1,5 +1,6 @@
 (ns tvb.gs
-  (:import (com.sun.jna Native)))
+  (:import (com.sun.jna Native))
+  (:use tvb.domain))
 
 (gen-interface
  :name tvb.gs.GSCallback
@@ -25,3 +26,14 @@
     (do
       (.main_with_cb libgslist (Integer. 5) gsArgs p)
       @buf)))
+
+(defn masterList []
+  (let [gsTvServers (listServers "tribesv" "\\hostname\\numplayers\\maxplayers\\mapname")]
+    (map parseServerInfo gsTvServers)))
+
+
+(defn hardList []
+  (let [servers  [
+                  [ "94.225.99.179", "7778", "Cobra server", "999", "14", "X" ],
+                  [ "64.27.56.209", "7778", "America", "999", "14", "X" ]]]
+    (map #(zipmap serverAttr %) servers)))

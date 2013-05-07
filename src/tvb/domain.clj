@@ -52,8 +52,9 @@
           infos      (rest (re-find (Pattern/compile regex) message)) ]
       (zipmap attributes infos))))
 
+(def serverAttr ["ip" "port" "hostname" "numplayers" "maxplayers" "mapname"])
 
 (defn parseServerInfo [message]
-  (let [infos      (rest (re-find serverInfoPattern message))
-        attributes ["ip" "port" "hostname" "numplayers" "maxplayers" "mapname"]]
-    (zipmap attributes infos)))
+  (let [infos  (rest (re-find serverInfoPattern message))]
+    (zipmap serverAttr infos)))
+
