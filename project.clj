@@ -1,5 +1,6 @@
 (defproject tvbrowser "0.0.1"
   :warn-on-reflection true
+  :native-path "native"
   :dependencies
   [[org.clojure/clojure "1.3.0"]
    [org.clojure/core.incubator "0.1.0"]
